@@ -91,12 +91,6 @@ public class AccessTokenService {
     return extractClaims(token).get("username", String.class);
   }
 
-  public boolean isExpired(String token) {
-    Claims claims = extractClaims(token);
-    Date expiration = claims.getExpiration();
-    return !expiration.before(new Date());
-  }
-
   private SecretKey getKey() {
     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
     return Keys.hmacShaKeyFor(keyBytes);

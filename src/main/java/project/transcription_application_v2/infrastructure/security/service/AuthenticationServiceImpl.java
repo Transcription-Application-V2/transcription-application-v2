@@ -50,8 +50,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     if (rt.isPresent()) {
       refreshTokenService.verifyExpiration(rt.get());
-      String token = accessTokenService.create(rt.get().getUser().getId());
-      RefreshToken newRt = refreshTokenService.createRefreshToken(rt.get().getUser().getId());
+
+      Long userId = rt.get().getUser().getId();
+
+      String token = accessTokenService.create(userId);
+
+      refreshTokenService.deleteByUserId(userId);
+
+      RefreshToken newRt = refreshTokenService.createRefreshToken(userId);
+
       return new AuthenticationResponse(token, newRt.getToken());
     }
     throw new RefreshTokenException(refreshToken, "Refresh token was expired. Please make a new sign-in request");
@@ -61,7 +68,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     try {
       User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-      refreshTokenService.deleteByUserId(user);
+      refreshTokenService.deleteByUserId(user.getId());
 
       SecurityContextHolder.getContext().setAuthentication(null);
 

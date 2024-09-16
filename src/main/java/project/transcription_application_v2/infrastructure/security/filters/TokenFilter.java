@@ -37,21 +37,20 @@ public class TokenFilter extends OncePerRequestFilter {
     String token = accessTokenService.getJWTFromRequest(request);
 
     try {
-      if (!StringUtils.hasText(token) || !accessTokenService.validate(token) || accessTokenService.isExpired(token))
-        throw new Exception("Empty, invalid or expired token.");
+      if (StringUtils.hasText(token) && accessTokenService.validate(token)){
+        String username = accessTokenService.extractUsername(token);
 
-      String username = accessTokenService.extractUsername(token);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-      UserDetails user = userDetailsService.loadUserByUsername(username);
+        UsernamePasswordAuthenticationToken authentication =
+            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-      UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-      authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-      SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+      }
     } catch (Exception exception) {
-      logger.error("Cannot set user authentication: {}", exception);
+      logger.error("Cannot set user authentication: {}", exception.getMessage());
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 

@@ -39,8 +39,8 @@ public class SecurityConfiguration {
         .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class)
 
         .authorizeHttpRequests(request -> request
-            .requestMatchers("/api/auth/sign-in").permitAll()
-            .requestMatchers("/api/auth/sign-up").permitAll()
+            .requestMatchers("/api/v2/user/create").permitAll()
+            .requestMatchers("/api/v2/auth/authenticate").permitAll()
             .anyRequest().authenticated())
 
         .authenticationProvider(authenticationProvider)
