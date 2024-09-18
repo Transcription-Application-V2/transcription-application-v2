@@ -37,4 +37,4 @@ out/
 .vscode/
 
 ### Environmental Files
-application.properties
+src/main/resources/application.properties
