@@ -1,5 +1,6 @@
 package project.transcription_application_v2.domain.transcription.service;
 
+import com.assemblyai.api.resources.transcripts.types.Transcript;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.transcription_application_v2.domain.paragraph.entity.Paragraph;
@@ -15,7 +16,11 @@ public class TranscriptionServiceImpl implements TranscriptionService {
 
   private final TranscriptionRepository transcriptionRepository;
 
-  public Transcription create(String name, List<Paragraph> paragraphs, Long size) {
+  public Transcription create(String name, List<Paragraph> paragraphs, Transcript transcript) {
+    long size = 0L;
+    if(transcript.getText().isPresent()) {
+      size = transcript.getText().get().length();
+    }
     Transcription transcription =  new Transcription(
         name,
         size,

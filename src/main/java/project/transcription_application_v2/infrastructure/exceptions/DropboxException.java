@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class GitHubException extends Throwable{
+public class DropboxException extends Throwable{
 
   private final String message;
 
-  public GitHubException(String message) {
+  public DropboxException(String message) {
     this.message = message;
   }
 }
