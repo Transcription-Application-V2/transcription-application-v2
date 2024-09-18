@@ -19,19 +19,25 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
-  private final RefreshTokenRepository refreshTokenRepository;
-
   @Value("${security.jwt.rt.expiration}")
   private Long refreshTokenDurationMs;
 
+  private final RefreshTokenRepository refreshTokenRepository;
+
   private final UserService userService;
 
-
-  public Optional<RefreshToken> findByToken(String token) {
-    return refreshTokenRepository.findByToken(token);
-  }
-
+  @Transactional
   public RefreshToken createRefreshToken(Long userId) {
+    Optional<RefreshToken> existingToken = refreshTokenRepository.findByUserId(userId);
+
+    // Delete already existing RefreshToken connected to the User
+    // Flush is necessary because the block is marked as @Transactional
+    // and changes won't persist until the whole block is executed
+    if (existingToken.isPresent()) {
+      this.deleteByUserId(userId);
+      refreshTokenRepository.flush();
+    }
+
     RefreshToken refreshToken = new RefreshToken(
         UUID.randomUUID().toString(),
         Instant.now().plusMillis(refreshTokenDurationMs),
@@ -39,6 +45,10 @@ public class RefreshTokenService {
 
     refreshToken = refreshTokenRepository.save(refreshToken);
     return refreshToken;
+  }
+
+  public Optional<RefreshToken> findByToken(String token) {
+    return refreshTokenRepository.findByToken(token);
   }
 
   public void verifyExpiration(RefreshToken token) throws RefreshTokenException {

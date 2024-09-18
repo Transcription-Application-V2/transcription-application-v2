@@ -23,9 +23,6 @@ public class Transcription extends BaseEntity {
   @Column
   private String name;
 
-  @Column(columnDefinition = "TEXT")
-  private String description;
-
   @Column
   private Long size;
 
@@ -35,7 +32,7 @@ public class Transcription extends BaseEntity {
   @Column(nullable = false)
   private LocalDateTime lastModifiedAt;
 
-  @OneToMany(mappedBy = "transcription")
+  @OneToMany(mappedBy = "transcription", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
   private List<Paragraph> paragraphs;
 
   @OneToOne(fetch = FetchType.LAZY)

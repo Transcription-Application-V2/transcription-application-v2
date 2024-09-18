@@ -34,9 +34,11 @@ dependencies {
 
     // ASSEMBLY API
     implementation 'com.assemblyai:assemblyai-java:1.1.1'
-
-    // EVERYTHING ELSE
+    // DROPBOX API
+    implementation group: 'com.dropbox.core', name: 'dropbox-core-sdk', version: '7.0.0'
+    // JSON WEB TOKEN (JWT)
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.5'
+    // MODEL MAPPER
     implementation 'org.modelmapper:modelmapper:3.2.0'
 
     // HELPERS

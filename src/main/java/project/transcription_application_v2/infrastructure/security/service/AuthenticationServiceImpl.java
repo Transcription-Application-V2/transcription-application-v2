@@ -41,25 +41,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
       return new AuthenticationResponse(token, refreshToken.getToken());
     } catch (Exception exception) {
-      throw new BadResponseException(exception.getMessage());
+      throw new BadResponseException("Authentication failed: {}" + exception.getMessage());
     }
   }
 
   public AuthenticationResponse refreshToken(String refreshToken) throws RefreshTokenException {
-    Optional<RefreshToken> rt = refreshTokenService.findByToken(refreshToken);
+    Optional<RefreshToken> existingToken = refreshTokenService.findByToken(refreshToken);
 
-    if (rt.isPresent()) {
-      refreshTokenService.verifyExpiration(rt.get());
+    if (existingToken.isPresent()) {
+      refreshTokenService.verifyExpiration(existingToken.get());
 
-      Long userId = rt.get().getUser().getId();
+      Long userId = existingToken.get().getUser().getId();
 
       String token = accessTokenService.create(userId);
 
-      refreshTokenService.deleteByUserId(userId);
+      RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(userId);
 
-      RefreshToken newRt = refreshTokenService.createRefreshToken(userId);
-
-      return new AuthenticationResponse(token, newRt.getToken());
+      return new AuthenticationResponse(token, newRefreshToken.getToken());
     }
     throw new RefreshTokenException(refreshToken, "Refresh token was expired. Please make a new sign-in request");
   }
@@ -74,7 +72,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
       return new MessageResponse("Successfully signed out.");
     } catch (Exception exception) {
-      return new MessageResponse(exception.getMessage());
+      return new MessageResponse("Signing out failed: {}" + exception.getMessage());
     }
   }
 

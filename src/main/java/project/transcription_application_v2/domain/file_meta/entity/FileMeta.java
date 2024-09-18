@@ -21,9 +21,6 @@ public class FileMeta extends BaseEntity {
   @Column(nullable = false)
   private String name;
 
-  @Column(columnDefinition = "text")
-  private String description;
-
   @Column(nullable = false)
   private Long size;
 

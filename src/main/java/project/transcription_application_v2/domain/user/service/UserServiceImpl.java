@@ -49,6 +49,10 @@ public class UserServiceImpl implements UserService {
     userRepository.save(user);
   }
 
+  public User getLoggedUser() {
+    return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+  }
+
   public boolean usernameExists(String username) {
     return userRepository.findByUsername(username).isPresent();
   }

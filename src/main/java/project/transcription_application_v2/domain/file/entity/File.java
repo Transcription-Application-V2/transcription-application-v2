@@ -22,9 +22,9 @@ public class File extends BaseEntity {
   @JoinColumn(name = "user_id")
   private User user;
 
-  @OneToOne(mappedBy = "file", fetch = FetchType.LAZY)
+  @OneToOne(mappedBy = "file", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
   private FileMeta fileMeta;
 
-  @OneToOne(mappedBy = "file", fetch = FetchType.LAZY)
+  @OneToOne(mappedBy = "file", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
   private Transcription transcription;
 }
