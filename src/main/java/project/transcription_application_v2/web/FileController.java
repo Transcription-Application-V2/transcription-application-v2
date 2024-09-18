@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import project.transcription_application_v2.domain.file.dto.UploadedFilesResponse;
 import project.transcription_application_v2.domain.file.service.FileProcessingService;
-import project.transcription_application_v2.domain.file.service.FileService;
-import project.transcription_application_v2.infrastructure.exceptions.AssemblyAIException;
 import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
-import project.transcription_application_v2.infrastructure.exceptions.DropboxException;
 
 import java.util.List;
 

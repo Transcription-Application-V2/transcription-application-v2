@@ -15,9 +15,9 @@ import project.transcription_application_v2.domain.transcription.entity.Transcri
 import project.transcription_application_v2.domain.transcription.service.TranscriptionService;
 import project.transcription_application_v2.infrastructure.assembly_api.dto.AssemblyConvertedFile;
 import project.transcription_application_v2.infrastructure.assembly_api.service.AssemblyService;
-import project.transcription_application_v2.infrastructure.assembly_api.service.DropboxService;
+import project.transcription_application_v2.infrastructure.assembly_api.service.GitHubService;
 import project.transcription_application_v2.infrastructure.exceptions.AssemblyAIException;
-import project.transcription_application_v2.infrastructure.exceptions.DropboxException;
+import project.transcription_application_v2.infrastructure.exceptions.GitHubException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class FileProcessingService {
 
   private static final Logger logger = LoggerFactory.getLogger(FileProcessingService.class);
 
-  private final DropboxService dropboxService;
+  private final GitHubService gitHubService;
   private final AssemblyService assemblyService;
   private final FileMetaService fileMetaService;
   private final ParagraphService paragraphService;
@@ -42,7 +42,7 @@ public class FileProcessingService {
 
     for (MultipartFile multipartFile : files) {
       try {
-        String downloadUrl = dropboxService.upload(multipartFile);
+        String downloadUrl = gitHubService.upload(multipartFile);
 
         AssemblyConvertedFile assemblyConvertedFile = assemblyService.transcribe(downloadUrl);
 
@@ -50,13 +50,15 @@ public class FileProcessingService {
 
         List<Paragraph> paragraphs = paragraphService.create(assemblyConvertedFile.getTranscript());
 
-        Transcription transcription = transcriptionService.create(multipartFile.getOriginalFilename(), paragraphs);
+        Long transcriptionSize = (long) assemblyConvertedFile.getTranscript().getText().get().length();
+
+        Transcription transcription = transcriptionService.create(multipartFile.getOriginalFilename(), paragraphs, transcriptionSize);
 
         File file = fileService.create(fileMeta, transcription);
 
         processedFiles.add(multipartFile.getOriginalFilename());
 
-      } catch (DropboxException | AssemblyAIException exception) {
+      } catch (GitHubException | AssemblyAIException exception) {
         logger.error("Error processing files: {}", exception.getMessage());
         unprocessedFiles.add(multipartFile.getOriginalFilename());
       }

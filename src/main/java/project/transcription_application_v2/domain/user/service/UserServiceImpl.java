@@ -11,6 +11,7 @@ import project.transcription_application_v2.domain.user.repository.UserRepositor
 import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
 import project.transcription_application_v2.infrastructure.security.dto.CreateUserRequest;
 import project.transcription_application_v2.infrastructure.security.dto.MessageResponse;
+import project.transcription_application_v2.infrastructure.security.entity.UserDetailsImpl;
 
 import java.time.LocalDateTime;
 
@@ -50,7 +51,8 @@ public class UserServiceImpl implements UserService {
   }
 
   public User getLoggedUser() {
-    return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    UserDetailsImpl loggedUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    return loggedUser.getUser();
   }
 
   public boolean usernameExists(String username) {

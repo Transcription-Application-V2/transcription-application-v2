@@ -15,10 +15,10 @@ public class TranscriptionServiceImpl implements TranscriptionService {
 
   private final TranscriptionRepository transcriptionRepository;
 
-  public Transcription create(String name, List<Paragraph> paragraphs) {
+  public Transcription create(String name, List<Paragraph> paragraphs, Long size) {
     Transcription transcription =  new Transcription(
         name,
-        null,
+        size,
         LocalDateTime.now(),
         LocalDateTime.now(),
         paragraphs

@@ -6,5 +6,5 @@ import project.transcription_application_v2.domain.transcription.entity.Transcri
 import java.util.List;
 
 public interface TranscriptionService {
-  Transcription create(String name, List<Paragraph> paragraphs);
+  Transcription create(String name, List<Paragraph> paragraphs, Long size);
 }
