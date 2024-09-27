@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class BadResponseException extends Throwable{
+public class BadResponseException extends Throwable {
 
   private final String message;
 

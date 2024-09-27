@@ -6,8 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,16 +14,15 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import project.transcription_application_v2.infrastructure.security.service.UserDetailsServiceImpl;
 import project.transcription_application_v2.infrastructure.security.service.AccessTokenService;
+import project.transcription_application_v2.infrastructure.security.service.UserDetailsServiceImpl;
 
 import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class TokenFilter extends OncePerRequestFilter {
-
-  private static final Logger logger = LoggerFactory.getLogger(AccessTokenService.class);
 
   private final AccessTokenService accessTokenService;
   private final UserDetailsServiceImpl userDetailsService;
@@ -50,7 +48,7 @@ public class TokenFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
       }
     } catch (Exception exception) {
-      logger.error("Cannot set user authentication: {}", exception.getMessage());
+      log.error("Cannot set user authentication: {}", exception.getMessage());
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 

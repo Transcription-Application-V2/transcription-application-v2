@@ -41,6 +41,7 @@ public class SecurityConfiguration {
         .authorizeHttpRequests(request -> request
             .requestMatchers("/api/v2/user/create").permitAll()
             .requestMatchers("/api/v2/auth/authenticate").permitAll()
+            .requestMatchers("/api/v2/auth/refresh-token").permitAll()
             .anyRequest().authenticated())
 
         .authenticationProvider(authenticationProvider)

@@ -7,6 +7,7 @@ import project.transcription_application_v2.domain.file_meta.entity.FileMeta;
 import project.transcription_application_v2.domain.file_meta.repository.FileMetaRepository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +17,7 @@ public class FileMetaServiceImpl implements FileMetaService {
 
   public FileMeta create(MultipartFile file, String downloadUrl, String assemblyId) {
     return new FileMeta(
-        file.getName(),
+        file.getOriginalFilename(),
         file.getSize(),
         file.getContentType(),
         LocalDateTime.now(),
@@ -25,5 +26,9 @@ public class FileMetaServiceImpl implements FileMetaService {
         null);
   }
 
+  public FileMeta findByFileId(Long fileId) {
+    Optional<FileMeta> fileMeta = fileMetaRepository.findByFileId(fileId);
+    return fileMeta.orElse(null);
+  }
 
 }

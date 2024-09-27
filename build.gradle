@@ -25,12 +25,13 @@ repositories {
 
 dependencies {
 
-    // SPRING FRAMEWORK
+    // SPRING WEB - SERVLET API
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    // SPRING SECURITY
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    // SPRING DATA JPA - JDBC LAYERED
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // SPRING VALIDATION
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // ASSEMBLY API
@@ -39,19 +40,22 @@ dependencies {
     implementation group: 'com.dropbox.core', name: 'dropbox-core-sdk', version: '7.0.0'
     // JSON WEB TOKEN (JWT)
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.5'
-    // MODEL MAPPER
-    implementation 'org.modelmapper:modelmapper:3.2.0'
 
-    // HELPERS
+    // LOMBOK
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // POSTGRESQL
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // SPRING DEV TOOLS
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    // TESTING
+    // SPRING TESTING
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
+    // MOCKITO & JUNIT5
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

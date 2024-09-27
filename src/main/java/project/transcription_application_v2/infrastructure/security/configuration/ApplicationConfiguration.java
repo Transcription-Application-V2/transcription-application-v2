@@ -1,7 +1,6 @@
 package project.transcription_application_v2.infrastructure.security.configuration;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,11 +23,6 @@ public class ApplicationConfiguration {
   @Value("${cors.allowed.origins}")
   private List<String> allowedOrigins;
   private final UserDetailsServiceImpl userDetailsService;
-
-  @Bean
-  public ModelMapper modelMapper() {
-    return new ModelMapper();
-  }
 
   @Bean
   public PasswordEncoder passwordEncoder() {

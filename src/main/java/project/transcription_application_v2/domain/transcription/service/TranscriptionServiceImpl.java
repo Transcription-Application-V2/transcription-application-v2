@@ -9,6 +9,7 @@ import project.transcription_application_v2.domain.transcription.repository.Tran
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,5 +32,10 @@ public class TranscriptionServiceImpl implements TranscriptionService {
     );
     paragraphs.forEach(paragraph -> {paragraph.setTranscription(transcription);});
     return transcription;
+  }
+
+  public Transcription findByFileId(Long fileId) {
+    Optional<Transcription> transcription = transcriptionRepository.findByFileIdWithParagraphs(fileId);
+    return transcription.orElse(null);
   }
 }

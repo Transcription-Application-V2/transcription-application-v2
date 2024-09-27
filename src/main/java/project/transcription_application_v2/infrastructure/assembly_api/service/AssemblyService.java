@@ -4,19 +4,15 @@ import com.assemblyai.api.AssemblyAI;
 import com.assemblyai.api.resources.transcripts.types.Transcript;
 import com.assemblyai.api.resources.transcripts.types.TranscriptOptionalParams;
 import jakarta.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import project.transcription_application_v2.infrastructure.assembly_api.dto.AssemblyConvertedFile;
 import project.transcription_application_v2.infrastructure.exceptions.AssemblyAIException;
 
-import java.util.List;
-
 @Service
+@Slf4j
 public class AssemblyService {
-
-  private final static Logger logger = LoggerFactory.getLogger(AssemblyService.class);
 
   @Value("${assembly_ai.api.key}")
   private String assemblyAiApiKey;
@@ -38,28 +34,35 @@ public class AssemblyService {
           .speakerLabels(true)
           .build();
       // Receives the transcription from the Assembly AI API request
-      Transcript transcript = assemblyAI.transcripts().transcribe(downloadUrl, params);
+      Transcript transcript = assemblyAI
+          .transcripts()
+          .transcribe(downloadUrl, params);
       return new AssemblyConvertedFile(transcript.getId(), downloadUrl, transcript);
     } catch (Exception exception) {
-      logger.error("Error transcribing the file: {}", exception.getMessage());
+      log.error("Error transcribing the file: {}", exception.getMessage());
       throw new AssemblyAIException("Error transcribing the file: {}" + exception.getMessage());
     }
   }
 
   public Transcript getById(String id) throws AssemblyAIException {
     try {
-      return this.assemblyAI.transcripts().get(id);
+      return this.assemblyAI
+          .transcripts()
+          .get(id);
     } catch (Exception exception) {
-      logger.error("Error while fetching transcription: {}", exception.getMessage());
+      log.error("Error while fetching transcription: {}", exception.getMessage());
       throw new AssemblyAIException("Error while fetching transcription: {}" + exception.getMessage());
     }
   }
 
   public void deleteById(String id) throws AssemblyAIException {
     try {
-      this.assemblyAI.transcripts().delete(id);
+      this.assemblyAI
+          .transcripts()
+          .delete(id);
+      log.info("Transcript deleted successfully");
     } catch (Exception exception) {
-      logger.error("Error deleting transcription: {}", exception.getMessage());
+      log.error("Error deleting transcription: {}", exception.getMessage());
       throw new AssemblyAIException("Error deleting transcription: {}" + exception.getMessage());
     }
   }

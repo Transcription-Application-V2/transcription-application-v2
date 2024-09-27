@@ -8,4 +8,7 @@ import java.util.List;
 
 public interface TranscriptionService {
   Transcription create(String name, List<Paragraph> paragraphs, Transcript transcript);
+
+  Transcription findByFileId(Long fileId);
+
 }

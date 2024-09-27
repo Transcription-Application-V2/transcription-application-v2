@@ -1,6 +1,7 @@
 package project.transcription_application_v2.web;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +23,7 @@ public class UserController {
   public ResponseEntity<MessageResponse> handleSignUp(@RequestBody CreateUserRequest createUserRequest) throws BadResponseException {
 
     return ResponseEntity
-        .ok()
+        .status(HttpStatus.CREATED)
         .body(userService.create(createUserRequest));
   }
 }
