@@ -1,12 +1,18 @@
 package project.transcription_application_v2.web;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import project.transcription_application_v2.domain.file.dto.DeletedFilesResponse;
 import project.transcription_application_v2.domain.file.dto.FileView;
@@ -14,13 +20,12 @@ import project.transcription_application_v2.domain.file.dto.UploadedFilesRespons
 import project.transcription_application_v2.domain.file.service.FileProcessingService;
 import project.transcription_application_v2.domain.file.service.FileService;
 import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
-
-import java.util.List;
+import project.transcription_application_v2.infrastructure.openAi.FileControllerDocumentation;
 
 @RestController
 @RequestMapping("/api/v2/file")
 @RequiredArgsConstructor
-public class FileControllerImpl {
+public class FileController implements FileControllerDocumentation {
 
   private final FileProcessingService fileProcessingService;
   private final FileService fileService;

@@ -15,8 +15,6 @@ public class OpenAPIConfig {
     return GroupedOpenApi.builder()
         .group("public-api")
         .pathsToMatch("/api/**")
-        .packagesToScan("project/transcription_application_v2/web",
-            "project/transcription_application_v2/infrastructure")
         .build();
   }
 
