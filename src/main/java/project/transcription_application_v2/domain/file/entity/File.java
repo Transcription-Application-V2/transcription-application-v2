@@ -1,6 +1,12 @@
 package project.transcription_application_v2.domain.file.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,9 +28,9 @@ public class File extends BaseEntity {
   @JoinColumn(name = "user_id")
   private User user;
 
-  @OneToOne(mappedBy = "file", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+  @OneToOne(mappedBy = "file", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
   private FileMeta fileMeta;
 
-  @OneToOne(mappedBy = "file", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+  @OneToOne(mappedBy = "file", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
   private Transcription transcription;
 }
