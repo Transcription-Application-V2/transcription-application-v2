@@ -11,7 +11,9 @@ public class TranscriptionApplicationV2Application {
   }
 
   /* TODO:
-      0. Implement MapStruct over ModelMapper
+      -2. Replace All dtos and viwes with records
+      -1. Implement Swagger - DONE
+      0. Implement MapStruct over ModelMapper - DONE
       1. Test uploading files with existing file name
       2. Test delete files - DONE
       3. Create get all files - DONE

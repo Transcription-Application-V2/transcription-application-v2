@@ -28,7 +28,7 @@ public class FileMeta extends BaseEntity {
   private String type;
 
   @Column(nullable = false)
-  private LocalDateTime date;
+  private LocalDateTime date = LocalDateTime.now();
 
   @Column(nullable = false, columnDefinition = "text")
   private String downloadUrl;
@@ -38,5 +38,5 @@ public class FileMeta extends BaseEntity {
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "file_id")
-  private File file;
+  private File file = null;
 }

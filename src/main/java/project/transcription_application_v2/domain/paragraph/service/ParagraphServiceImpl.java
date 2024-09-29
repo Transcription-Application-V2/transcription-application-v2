@@ -18,6 +18,7 @@ public class ParagraphServiceImpl implements ParagraphService {
 
   private final ParagraphRepository paragraphRepository;
 
+  //TODO:: make it from here to save to the database
   public List<Paragraph> create(Transcript transcript) {
 
     List<Paragraph> paragraphs = new ArrayList<>();
