@@ -6,11 +6,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class BadResponseException extends Throwable {
+public class BadResponseException extends Throwable implements GeneralException{
 
   private final String message;
 
   public BadResponseException(String message) {
     this.message = message;
+  }
+
+  @Override
+  public String getTitle() {
+    return "Bad Response";
   }
 }

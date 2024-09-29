@@ -6,11 +6,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class DropboxException extends Throwable{
+public class DropboxException extends Throwable implements GeneralException{
 
   private final String message;
 
   public DropboxException(String message) {
     this.message = message;
+  }
+
+  @Override
+  public String getTitle() {
+    return "Dropbox Error";
   }
 }

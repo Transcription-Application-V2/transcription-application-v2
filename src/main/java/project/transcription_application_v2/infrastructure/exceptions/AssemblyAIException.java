@@ -6,11 +6,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class AssemblyAIException extends Throwable {
+public class AssemblyAIException extends Throwable implements GeneralException{
 
   private final String message;
 
   public AssemblyAIException(String message) {
     this.message = message;
+  }
+
+  @Override
+  public String getTitle() {
+    return "AssemblyAI Error";
   }
 }
