@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v2/file")
 @RequiredArgsConstructor
-public class FileController {
+public class FileControllerImpl {
 
   private final FileProcessingService fileProcessingService;
   private final FileService fileService;

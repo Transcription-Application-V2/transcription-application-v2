@@ -21,6 +21,21 @@ public class SecurityConfiguration {
   private final TokenFilter tokenFilter;
   private final CorsConfiguration corsConfiguration;
   private final AuthenticationProvider authenticationProvider;
+  private static final String[] WHITE_LIST = {
+      "/v2/api-docs",
+      "/v3/api-docs",
+      "/v3/api-docs/**",
+      "/swagger-resources",
+      "/swagger-resources/**",
+      "/configuration/ui",
+      "/configuration/security",
+      "/swagger-ui/**",
+      "/webjars/**",
+      "/swagger-ui.html",
+      "/api/v2/user/create",
+      "/api/v2/auth/authenticate",
+      "/api/v2/auth/refresh-token",
+  };
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,9 +54,7 @@ public class SecurityConfiguration {
         .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class)
 
         .authorizeHttpRequests(request -> request
-            .requestMatchers("/api/v2/user/create").permitAll()
-            .requestMatchers("/api/v2/auth/authenticate").permitAll()
-            .requestMatchers("/api/v2/auth/refresh-token").permitAll()
+            .requestMatchers(WHITE_LIST).permitAll()
             .anyRequest().authenticated())
 
         .authenticationProvider(authenticationProvider)

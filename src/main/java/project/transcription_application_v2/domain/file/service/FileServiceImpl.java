@@ -9,18 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 import project.transcription_application_v2.domain.file.dto.FileView;
 import project.transcription_application_v2.domain.file.entity.File;
 import project.transcription_application_v2.domain.file.repository.FileRepository;
-import project.transcription_application_v2.domain.file_meta.dto.FileMetaView;
 import project.transcription_application_v2.domain.file_meta.entity.FileMeta;
 import project.transcription_application_v2.domain.file_meta.service.FileMetaService;
-import project.transcription_application_v2.domain.transcription.dto.TranscriptionView;
 import project.transcription_application_v2.domain.transcription.entity.Transcription;
 import project.transcription_application_v2.domain.transcription.service.TranscriptionService;
 import project.transcription_application_v2.domain.user.service.UserService;
 import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
-import project.transcription_application_v2.infrastructure.mappers.FileMetaMapper;
-import project.transcription_application_v2.infrastructure.mappers.TranscriptionMapper;
-
-import java.util.Optional;
+import project.transcription_application_v2.infrastructure.mappers.FileMapper;
 
 @Service
 @RequiredArgsConstructor
@@ -29,11 +24,8 @@ public class FileServiceImpl implements FileService {
 
   private final FileRepository fileRepository;
   private final UserService userService;
-  private final FileMetaService fileMetaService;
-  private final TranscriptionService transcriptionService;
 
-  private final FileMetaMapper fileMetaMapper;
-  private final TranscriptionMapper transcriptionMapper;
+  private final FileMapper fileMapper;
 
   public File create(FileMeta fileMeta, Transcription transcription) {
     File file = new File(userService.getLoggedUser(), fileMeta, transcription);
@@ -43,42 +35,27 @@ public class FileServiceImpl implements FileService {
   }
 
   public File get(Long id) throws BadResponseException {
-    Optional<File> file = fileRepository.findById(id);
-
-    if (file.isPresent())
-      return file.get();
-
-    throw new BadResponseException("File not found");
+    return getFileById(id);
   }
 
   @Transactional
-  public void delete(File file) {
-    fileRepository.deleteFileMetaByFileId(file.getId());
-
-    fileRepository.deleteTranscriptionByFileId(file.getId());
-
-    fileRepository.deleteFileById(file.getId());
+  public void delete(File file) throws BadResponseException {
+    fileRepository.delete(getFileById(file.getId()));
   }
 
   public Page<FileView> getAll(Pageable pageable) {
-    return mapFilesToFilesViews(fileRepository.retrieveAllFiles(pageable));
+    return fileRepository.retrieveAllFiles(pageable)
+        .map(fileMapper::toView);
   }
 
   public Page<FileView> getCurrentUsers(Pageable pageable) {
-    return mapFilesToFilesViews(fileRepository.retrieveAllFilesByUserId(userService.getLoggedUser().getId(), pageable));
+    return fileRepository.retrieveAllFilesByUserId(userService.getLoggedUser().getId(), pageable)
+        .map(fileMapper::toView);
   }
 
-  private Page<FileView> mapFilesToFilesViews(Page<File> files) {
-    return files
-        .map(file -> {
-          FileMeta fileMeta = fileMetaService.findByFileId(file.getId());
-          Transcription transcription = transcriptionService.findByFileId(file.getId());
+  private File getFileById(Long id) throws BadResponseException {
+    return fileRepository.findById(id)
+        .orElseThrow(() -> new BadResponseException("File not found"));
 
-          FileMetaView fileMetaView = fileMetaMapper.toFileMetaView(fileMeta);
-          TranscriptionView transcriptionView = transcriptionMapper.toTranscriptionView(transcription);
-
-          return new FileView(file.getId(), fileMetaView, transcriptionView);
-        });
   }
-
 }

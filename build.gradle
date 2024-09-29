@@ -13,6 +13,20 @@ java {
     }
 }
 
+ext {
+    mapstructVersion = '1.5.5.Final'
+    lombokMapstructBindingVersion = '0.2.0'
+    springBootVersion = '3.3.3'
+    dependencyManagementVersion = '1.1.6'
+    assemblyApiVersion = '1.1.1'
+    dropboxCoreSdkVersion = '7.0.0'
+    jjwtVersion = '0.12.5'
+    mockitoCoreVersion = '5.12.0'
+    junitPlatformLauncherVersion = '1.8.2'
+    postgresqlVersion = '42.3.1'
+    swaggerVersion = '2.2.0'
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -24,40 +38,44 @@ repositories {
 }
 
 dependencies {
-
     // SPRING WEB - SERVLET API
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
     // SPRING SECURITY
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
     // SPRING DATA JPA - JDBC LAYERED
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
     // SPRING VALIDATION
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}"
 
     // ASSEMBLY API
-    implementation 'com.assemblyai:assemblyai-java:1.1.1'
+    implementation "com.assemblyai:assemblyai-java:${assemblyApiVersion}"
     // DROPBOX API
-    implementation group: 'com.dropbox.core', name: 'dropbox-core-sdk', version: '7.0.0'
+    implementation "com.dropbox.core:dropbox-core-sdk:${dropboxCoreSdkVersion}"
     // JSON WEB TOKEN (JWT)
-    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.5'
+    implementation "io.jsonwebtoken:jjwt:${jjwtVersion}"
 
     // LOMBOK
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly "org.projectlombok:lombok"
+    annotationProcessor "org.projectlombok:lombok"
 
     // POSTGRESQL
-    runtimeOnly 'org.postgresql:postgresql'
-
-    // SPRING DEV TOOLS
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly "org.postgresql:postgresql:${postgresqlVersion}"
 
     // SPRING TESTING
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+    testImplementation "org.springframework.security:spring-security-test:${springBootVersion}"
 
     // MOCKITO & JUNIT5
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation "org.mockito:mockito-core:${mockitoCoreVersion}"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:${junitPlatformLauncherVersion}"
+
+    // MAPSTRUCT
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+
+    // SWAGGER
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${swaggerVersion}"
 }
 
 tasks.named('test') {

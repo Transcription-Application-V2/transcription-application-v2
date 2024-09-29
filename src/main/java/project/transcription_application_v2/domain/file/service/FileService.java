@@ -15,7 +15,7 @@ public interface FileService {
 
   File get(Long id) throws BadResponseException;
 
-  void delete(File file);
+  void delete(File file) throws BadResponseException;
 
   Page<FileView> getAll(Pageable pageable);
 
