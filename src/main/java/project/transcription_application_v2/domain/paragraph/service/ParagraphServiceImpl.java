@@ -24,7 +24,7 @@ public class ParagraphServiceImpl implements ParagraphService {
   private final ParagraphRepository paragraphRepository;
 
   @Autowired
-  public void setAppointmentService(@Lazy TranscriptionService transcriptionService) {
+  public void setTranscriptionService(@Lazy TranscriptionService transcriptionService) {
     this.transcriptionService = transcriptionService;
   }
 
@@ -46,5 +46,17 @@ public class ParagraphServiceImpl implements ParagraphService {
       log.warn("No utterances present..");
 
     paragraphRepository.saveAll(paragraphs);
+  }
+
+  @Override
+  public void delete(Long paragraphId) throws NotFoundException {
+    Paragraph byId = findById(paragraphId);
+
+    paragraphRepository.delete(byId);
+  }
+
+  private Paragraph findById(Long paragraphId) throws NotFoundException {
+    return paragraphRepository.findById(paragraphId)
+        .orElseThrow(() -> new NotFoundException("Paragraph not found"));
   }
 }

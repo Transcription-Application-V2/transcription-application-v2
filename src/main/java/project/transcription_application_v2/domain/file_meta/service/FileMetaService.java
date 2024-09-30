@@ -9,5 +9,7 @@ public interface FileMetaService {
 
   void create(CreateFileMeta dto) throws BadResponseException, NotFoundException;
 
-  FileMeta findById(Long fileId);
+  void delete(Long fileId) throws NotFoundException;
+
+  FileMeta findById(Long fileId) throws NotFoundException;
 }

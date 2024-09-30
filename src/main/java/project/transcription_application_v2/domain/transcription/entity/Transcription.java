@@ -39,7 +39,7 @@ public class Transcription extends BaseEntity {
   @Column(nullable = false)
   private LocalDateTime lastModifiedAt = LocalDateTime.now();
 
-  @OneToMany(mappedBy = "transcription", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+  @OneToMany(mappedBy = "transcription")
   private List<Paragraph> paragraphs = new ArrayList<>();
 
   @OneToOne(fetch = FetchType.LAZY)

@@ -8,7 +8,9 @@ import project.transcription_application_v2.domain.file.dto.DeletedFilesResponse
 import project.transcription_application_v2.domain.file.dto.FileView;
 import project.transcription_application_v2.domain.file.dto.UploadedFilesResponse;
 import project.transcription_application_v2.domain.file.entity.File;
+import project.transcription_application_v2.infrastructure.exceptions.AssemblyAIException;
 import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
+import project.transcription_application_v2.infrastructure.exceptions.DropboxException;
 import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
 
 public interface FileService {
@@ -18,6 +20,8 @@ public interface FileService {
   File findById(Long id) throws NotFoundException;
 
   DeletedFilesResponse delete(List<Long> ids) throws BadResponseException, NotFoundException;
+
+  void delete (Long id) throws NotFoundException, AssemblyAIException, DropboxException;
 
   Page<FileView> getAll(Pageable pageable);
 

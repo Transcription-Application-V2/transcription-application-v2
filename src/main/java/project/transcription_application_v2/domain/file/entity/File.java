@@ -30,9 +30,9 @@ public class File extends BaseEntity {
   @JoinColumn(name = "user_id")
   private User user;
 
-  @OneToOne(mappedBy = "file", cascade = {CascadeType.MERGE, CascadeType.PERSIST , CascadeType.REMOVE})
-  private FileMeta fileMeta = null;
+  @OneToOne(mappedBy = "file")
+  private FileMeta fileMeta;
 
-  @OneToOne(mappedBy = "file", cascade = {CascadeType.MERGE, CascadeType.PERSIST , CascadeType.REMOVE})
-  private Transcription transcription = null;
+  @OneToOne(mappedBy = "file")
+  private Transcription transcription;
 }

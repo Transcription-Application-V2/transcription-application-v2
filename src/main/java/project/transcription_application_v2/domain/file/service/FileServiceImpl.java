@@ -121,11 +121,8 @@ public class FileServiceImpl implements FileService {
 
     for (Long id : ids) {
       try {
-        File file = getFileById(id);
-
-        dropboxService.delete(file);
-        assemblyService.deleteById(file.getFileMeta().getAssemblyAiId());
-        fileRepository.delete(file);
+        File file = findById(id);
+        delete(id);
 
         deletedFiles.add(file.getFileMeta().getName());
       } catch (DropboxException | AssemblyAIException | NotFoundException exception) {
@@ -135,6 +132,18 @@ public class FileServiceImpl implements FileService {
     }
 
     return new DeletedFilesResponse(deletedFiles, failedIds);
+  }
+
+  @Override
+  @Transactional
+  public void delete(Long id) throws NotFoundException, AssemblyAIException, DropboxException {
+    File file = findById(id);
+
+    dropboxService.delete(file);
+    assemblyService.deleteById(file.getFileMeta().getAssemblyAiId());
+    fileMetaService.delete(file.getFileMeta().getId());
+    transcriptionService.delete(file.getTranscription().getId());
+    fileRepository.delete(file);
   }
 
   public Page<FileView> getAll(Pageable pageable) {
@@ -150,6 +159,5 @@ public class FileServiceImpl implements FileService {
   private File getFileById(Long id) throws NotFoundException {
     return fileRepository.findById(id)
         .orElseThrow(() -> new NotFoundException("File not found"));
-
   }
 }

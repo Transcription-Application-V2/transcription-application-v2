@@ -41,11 +41,6 @@ public class SecurityConfiguration {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
     return http
-        .exceptionHandling(exceptionHandling -> exceptionHandling
-            .authenticationEntryPoint((request, response, authException) -> {
-              response.sendError(response.getStatus());
-            }))
-
         .cors(cors -> cors
             .configurationSource(request -> corsConfiguration))
 

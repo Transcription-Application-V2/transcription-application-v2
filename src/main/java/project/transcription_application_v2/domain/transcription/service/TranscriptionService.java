@@ -10,4 +10,6 @@ public interface TranscriptionService {
 
   Transcription findById(Long id) throws NotFoundException;
 
+  void delete(Long id) throws NotFoundException;
+
 }

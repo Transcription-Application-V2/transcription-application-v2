@@ -6,4 +6,6 @@ import project.transcription_application_v2.infrastructure.exceptions.NotFoundEx
 public interface ParagraphService {
 
   void create(CreateParagraph dto) throws NotFoundException;
+
+  void delete(Long paragraphId) throws NotFoundException;
 }

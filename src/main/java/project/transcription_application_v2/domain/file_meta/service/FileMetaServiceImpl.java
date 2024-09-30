@@ -23,7 +23,7 @@ public class FileMetaServiceImpl implements FileMetaService {
   private final FileMetaMapper fileMetaMapper;
 
   @Autowired
-  public void setAppointmentService(@Lazy FileService fileService) {
+  public void setFileService(@Lazy FileService fileService) {
     this.fileService = fileService;
   }
 
@@ -33,8 +33,16 @@ public class FileMetaServiceImpl implements FileMetaService {
     fileMetaRepository.save(fileMetaMapper.toEntity(dto, file));
   }
 
-  public FileMeta findById(Long fileId) {
-    return fileMetaRepository.findByFileId(fileId).orElse(null);
+  @Override
+  public void delete(Long fileId) throws NotFoundException {
+    FileMeta byId = findById(fileId);
+
+    fileMetaRepository.delete(byId);
+  }
+
+  public FileMeta findById(Long fileId) throws NotFoundException {
+    return fileMetaRepository.findByFileId(fileId)
+        .orElseThrow(() -> new NotFoundException("FileMeta not found"));
   }
 
 }
