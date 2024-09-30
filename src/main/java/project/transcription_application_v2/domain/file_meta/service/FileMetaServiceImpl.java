@@ -1,5 +1,6 @@
 package project.transcription_application_v2.domain.file_meta.service;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -40,9 +41,25 @@ public class FileMetaServiceImpl implements FileMetaService {
     fileMetaRepository.delete(byId);
   }
 
+  @Override
   public FileMeta findById(Long fileId) throws NotFoundException {
-    return fileMetaRepository.findByFileId(fileId)
+    return fileMetaRepository.findById(fileId)
         .orElseThrow(() -> new NotFoundException("FileMeta not found"));
+  }
+
+  @Override
+  public boolean moreThenOneDropboxDownloadUrls(String downloadUrl) {
+    return fileMetaRepository.countAllByDownloadUrl(downloadUrl) > 1;
+  }
+
+  @Override
+  public boolean moreThenOneAssemblyAiIds(String assemblyAiId) {
+    return fileMetaRepository.countAllByAssemblyAiId(assemblyAiId) > 1;
+  }
+
+  @Override
+  public Optional<FileMeta> findFirstByDownloadUrl(String downloadUrl) {
+    return fileMetaRepository.findFirstByDownloadUrl(downloadUrl);
   }
 
 }

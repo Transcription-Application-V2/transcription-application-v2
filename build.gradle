@@ -76,6 +76,9 @@ dependencies {
 
     // SWAGGER
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${swaggerVersion}"
+
+    implementation 'commons-codec:commons-codec:1.15'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 }
 
 tasks.named('test') {

@@ -23,6 +23,7 @@ import project.transcription_application_v2.domain.user.service.UserService;
 import project.transcription_application_v2.infrastructure.assembly_api.dto.AssemblyConvertedFile;
 import project.transcription_application_v2.infrastructure.assembly_api.service.AssemblyService;
 import project.transcription_application_v2.infrastructure.dropbox_api.DropboxService;
+import project.transcription_application_v2.infrastructure.dropbox_api.dto.UploadedDropboxFile;
 import project.transcription_application_v2.infrastructure.exceptions.AssemblyAIException;
 import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
 import project.transcription_application_v2.infrastructure.exceptions.DropboxException;
@@ -69,16 +70,17 @@ public class FileServiceImpl implements FileService {
     User loggedUser = userService.getLoggedUser();
 
     for (MultipartFile multipartFile : files) {
-      File file = new File();
       try {
+        UploadedDropboxFile uploadedDropboxFile = dropboxService.upload(multipartFile , loggedUser.getId());
+        AssemblyConvertedFile assemblyConvertedFile = assemblyService.transcribe(uploadedDropboxFile.url());
+
+        File file = new File();
         file.setUser(loggedUser);
         File savedFile = fileRepository.save(file);
 
-        String downloadUrl = dropboxService.upload(multipartFile);
-        AssemblyConvertedFile assemblyConvertedFile = assemblyService.transcribe(downloadUrl);
-
         CreateFileMeta fileMetaDto = new CreateFileMeta(
             multipartFile,
+            uploadedDropboxFile.name(),
             assemblyConvertedFile.getDownloadUrl(),
             assemblyConvertedFile.getAssemblyId(),
             savedFile.getId()
@@ -139,7 +141,7 @@ public class FileServiceImpl implements FileService {
   public void delete(Long id) throws NotFoundException, AssemblyAIException, DropboxException {
     File file = findById(id);
 
-    dropboxService.delete(file);
+    dropboxService.delete(file , userService.getLoggedUser().getId());
     assemblyService.deleteById(file.getFileMeta().getAssemblyAiId());
     fileMetaService.delete(file.getFileMeta().getId());
     transcriptionService.delete(file.getTranscription().getId());

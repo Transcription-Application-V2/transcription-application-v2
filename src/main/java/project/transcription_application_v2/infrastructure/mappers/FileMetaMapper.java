@@ -17,7 +17,7 @@ public interface FileMetaMapper {
   FileMetaView toView(FileMeta entity);
 
   @Mappings({
-      @Mapping(target = "name", source = "dto.file.originalFilename"),
+      @Mapping(target = "name", source = "dto.name"),
       @Mapping(target = "size", source = "dto.file.size"),
       @Mapping(target = "type", source = "dto.file.contentType"),
       @Mapping(target = "downloadUrl", source = "dto.downloadUrl"),

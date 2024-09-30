@@ -1,14 +1,10 @@
 package project.transcription_application_v2.domain.file.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-public class UploadedFilesResponse {
+public record UploadedFilesResponse(
+    List<String> processedFiles,
+    List<String> unprocessedFiles
+) {
 
-  private List<String> processedFiles;
-  private List<String> unprocessedFiles;
 }

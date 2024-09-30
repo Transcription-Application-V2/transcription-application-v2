@@ -4,6 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public record CreateFileMeta(
     MultipartFile file,
+    String name,
     String downloadUrl,
     String assemblyId,
     Long fileId) {
