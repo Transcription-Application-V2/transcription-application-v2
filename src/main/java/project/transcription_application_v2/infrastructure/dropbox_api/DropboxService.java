@@ -1,4 +1,4 @@
-package project.transcription_application_v2.infrastructure.assembly_api.service;
+package project.transcription_application_v2.infrastructure.dropbox_api;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;

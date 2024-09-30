@@ -1,6 +1,7 @@
 package project.transcription_application_v2.infrastructure.security.service;
 
 import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
+import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
 import project.transcription_application_v2.infrastructure.exceptions.RefreshTokenException;
 import project.transcription_application_v2.infrastructure.security.dto.AuthenticationRequest;
 import project.transcription_application_v2.infrastructure.security.dto.AuthenticationResponse;
@@ -10,7 +11,8 @@ public interface AuthenticationService {
 
   AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) throws BadResponseException;
 
-  AuthenticationResponse refreshToken(String refreshToken) throws RefreshTokenException;
+  AuthenticationResponse refreshToken(String refreshToken)
+      throws RefreshTokenException, NotFoundException;
 
   MessageResponse signOut();
 

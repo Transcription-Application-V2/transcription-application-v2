@@ -16,6 +16,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class AccessTokenService {
     return StringUtils.hasText(token) && token.startsWith("Bearer ") ? token.replace("Bearer ", "") : "";
   }
 
-  public String create(Long userId) {
+  public String create(Long userId) throws NotFoundException {
 
     Date now = new Date(System.currentTimeMillis());
 

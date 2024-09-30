@@ -17,9 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 import project.transcription_application_v2.domain.file.dto.DeletedFilesResponse;
 import project.transcription_application_v2.domain.file.dto.FileView;
 import project.transcription_application_v2.domain.file.dto.UploadedFilesResponse;
-import project.transcription_application_v2.domain.file.service.FileProcessingService;
 import project.transcription_application_v2.domain.file.service.FileService;
 import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
+import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
 import project.transcription_application_v2.infrastructure.openAi.FileControllerDocumentation;
 
 @RestController
@@ -27,8 +27,7 @@ import project.transcription_application_v2.infrastructure.openAi.FileController
 @RequiredArgsConstructor
 public class FileController implements FileControllerDocumentation {
 
-  private final FileProcessingService fileProcessingService;
-  private final FileService fileService;
+  private final FileService service;
 
   @PostMapping(path = "/upload", consumes = {"multipart/form-data"}, produces = "application/json")
   public ResponseEntity<UploadedFilesResponse> upload(@RequestParam("files") List<MultipartFile> files) throws BadResponseException {
@@ -38,18 +37,19 @@ public class FileController implements FileControllerDocumentation {
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(fileProcessingService.process(files));
+        .body(service.create(files));
   }
 
   @DeleteMapping("/delete")
-  public ResponseEntity<DeletedFilesResponse> delete(@RequestParam("ids") List<Long> ids) throws BadResponseException {
+  public ResponseEntity<DeletedFilesResponse> delete(@RequestParam("ids") List<Long> ids)
+      throws BadResponseException, NotFoundException {
 
     if (ids.isEmpty())
       throw new BadResponseException("No ids provided: {}");
 
     return ResponseEntity
         .ok()
-        .body(fileProcessingService.delete(ids));
+        .body(service.delete(ids));
   }
 
   @GetMapping("/all")
@@ -61,7 +61,7 @@ public class FileController implements FileControllerDocumentation {
 
     return ResponseEntity
         .ok()
-        .body(fileService.getAll(pageable));
+        .body(service.getAll(pageable));
   }
 
   @GetMapping("/current-user")
@@ -73,7 +73,7 @@ public class FileController implements FileControllerDocumentation {
 
     return ResponseEntity
         .ok()
-        .body(fileService.getCurrentUsers(pageable));
+        .body(service.getCurrentUsers(pageable));
   }
 
 }

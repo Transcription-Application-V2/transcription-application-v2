@@ -16,6 +16,7 @@ import project.transcription_application_v2.domain.file.dto.DeletedFilesResponse
 import project.transcription_application_v2.domain.file.dto.FileView;
 import project.transcription_application_v2.domain.file.dto.UploadedFilesResponse;
 import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
+import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
 
 public interface FileControllerDocumentation {
 
@@ -39,7 +40,7 @@ public interface FileControllerDocumentation {
   })
   @SecurityRequirement(name = "bearerAuth")
   ResponseEntity<DeletedFilesResponse> delete(@RequestParam("ids") List<Long> ids)
-      throws BadResponseException;
+      throws BadResponseException, NotFoundException;
 
   @Operation(summary = "Get all files", description = "Get all files with pagination")
   @ApiResponses(value = {

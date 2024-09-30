@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import project.transcription_application_v2.domain.user.entity.User;
 import project.transcription_application_v2.domain.user.repository.UserRepository;
 import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
+import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
 import project.transcription_application_v2.infrastructure.mappers.UserMapper;
 import project.transcription_application_v2.infrastructure.security.dto.CreateUserRequest;
 import project.transcription_application_v2.infrastructure.security.dto.MessageResponse;
@@ -27,8 +28,9 @@ public class UserServiceImpl implements UserService {
     );
   }
 
-  public User findById(Long id){
-      return userRepository.findById(id).orElse(null);
+  public User findById(Long id) throws NotFoundException {
+    return userRepository.findById(id)
+        .orElseThrow(() -> new NotFoundException("User with id: " + id + " not found"));
   }
 
   public User getLoggedUser() {

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.transcription_application_v2.domain.user.service.UserService;
+import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
 import project.transcription_application_v2.infrastructure.exceptions.RefreshTokenException;
 import project.transcription_application_v2.infrastructure.security.entity.RefreshToken;
 import project.transcription_application_v2.infrastructure.security.repository.RefreshTokenRepository;
@@ -25,7 +26,7 @@ public class RefreshTokenService {
   private final UserService userService;
 
   @Transactional
-  public RefreshToken createRefreshToken(Long userId) {
+  public RefreshToken createRefreshToken(Long userId) throws NotFoundException {
     Optional<RefreshToken> existingToken = refreshTokenRepository.findByUserId(userId);
 
     // Delete already existing RefreshToken connected to the User
@@ -57,7 +58,7 @@ public class RefreshTokenService {
   }
 
   @Transactional
-  public void deleteByUserId(Long id) {
+  public void deleteByUserId(Long id) throws NotFoundException {
     refreshTokenRepository.deleteByUser(userService.findById(id));
   }
 

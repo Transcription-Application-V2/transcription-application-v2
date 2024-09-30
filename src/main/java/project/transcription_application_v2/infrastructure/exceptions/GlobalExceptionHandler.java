@@ -39,6 +39,16 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(problemDetail, HttpStatus.FORBIDDEN);
   }
 
+  @ExceptionHandler(NotFoundException.class)
+  public ResponseEntity<ProblemDetail> handleNotFoundException(NotFoundException e) {
+    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND,
+        e.getMessage());
+
+    problemDetail.setTitle("Not Found");
+
+    return new ResponseEntity<>(problemDetail, HttpStatus.NOT_FOUND);
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ProblemDetail> handleValidationExceptions(
       MethodArgumentNotValidException ex) {

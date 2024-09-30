@@ -1,29 +1,41 @@
 package project.transcription_application_v2.domain.file_meta.service;
 
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import project.transcription_application_v2.domain.file.entity.File;
+import project.transcription_application_v2.domain.file.service.FileService;
+import project.transcription_application_v2.domain.file_meta.dto.CreateFileMeta;
 import project.transcription_application_v2.domain.file_meta.entity.FileMeta;
 import project.transcription_application_v2.domain.file_meta.repository.FileMetaRepository;
+import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
+import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
 import project.transcription_application_v2.infrastructure.mappers.FileMetaMapper;
 
 @Service
 @RequiredArgsConstructor
 public class FileMetaServiceImpl implements FileMetaService {
 
+  private FileService fileService;
+
   private final FileMetaRepository fileMetaRepository;
 
   private final FileMetaMapper fileMetaMapper;
 
-  //TODO:: make it from here to save into the database
-  public FileMeta create(MultipartFile file, String downloadUrl, String assemblyId) {
-    return fileMetaMapper.toEntity(file, downloadUrl, assemblyId);
+  @Autowired
+  public void setAppointmentService(@Lazy FileService fileService) {
+    this.fileService = fileService;
   }
 
-  public FileMeta findByFileId(Long fileId) {
-    Optional<FileMeta> fileMeta = fileMetaRepository.findByFileId(fileId);
-    return fileMeta.orElse(null);
+  public FileMeta create(CreateFileMeta dto) throws NotFoundException {
+    File file = fileService.findById(dto.fileId());
+
+    return fileMetaRepository.save(fileMetaMapper.toEntity(dto, file));
+  }
+
+  public FileMeta findById(Long fileId) {
+    return fileMetaRepository.findByFileId(fileId).orElse(null);
   }
 
 }

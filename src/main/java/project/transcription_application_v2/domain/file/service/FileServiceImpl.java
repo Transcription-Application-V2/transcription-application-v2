@@ -1,20 +1,32 @@
 package project.transcription_application_v2.domain.file.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import project.transcription_application_v2.domain.file.dto.DeletedFilesResponse;
 import project.transcription_application_v2.domain.file.dto.FileView;
+import project.transcription_application_v2.domain.file.dto.UploadedFilesResponse;
 import project.transcription_application_v2.domain.file.entity.File;
 import project.transcription_application_v2.domain.file.repository.FileRepository;
-import project.transcription_application_v2.domain.file_meta.entity.FileMeta;
+import project.transcription_application_v2.domain.file_meta.dto.CreateFileMeta;
 import project.transcription_application_v2.domain.file_meta.service.FileMetaService;
-import project.transcription_application_v2.domain.transcription.entity.Transcription;
+import project.transcription_application_v2.domain.transcription.dto.CreateTranscription;
 import project.transcription_application_v2.domain.transcription.service.TranscriptionService;
+import project.transcription_application_v2.domain.user.entity.User;
 import project.transcription_application_v2.domain.user.service.UserService;
+import project.transcription_application_v2.infrastructure.assembly_api.dto.AssemblyConvertedFile;
+import project.transcription_application_v2.infrastructure.assembly_api.service.AssemblyService;
+import project.transcription_application_v2.infrastructure.dropbox_api.DropboxService;
+import project.transcription_application_v2.infrastructure.exceptions.AssemblyAIException;
 import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
+import project.transcription_application_v2.infrastructure.exceptions.DropboxException;
+import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
 import project.transcription_application_v2.infrastructure.mappers.FileMapper;
 
 @Service
@@ -23,24 +35,106 @@ import project.transcription_application_v2.infrastructure.mappers.FileMapper;
 public class FileServiceImpl implements FileService {
 
   private final FileRepository fileRepository;
+
   private final UserService userService;
+  private final DropboxService dropboxService;
+  private final AssemblyService assemblyService;
+  private final FileMetaService fileMetaService;
+  private final TranscriptionService transcriptionService;
 
   private final FileMapper fileMapper;
 
-  public File create(FileMeta fileMeta, Transcription transcription) {
-    File file = new File(userService.getLoggedUser(), fileMeta, transcription);
-    fileMeta.setFile(file);
-    transcription.setFile(file);
-    return fileRepository.save(file);
+  /**
+   * Processes a list of multipart files by uploading them to Dropbox, transcribing them using
+   * Assembly AI, and saving the resulting metadata and transcription to the database.
+   *
+   * <p>Steps involved:
+   * <ul>
+   *   <li>Retrieve the logged-in user.</li>
+   *   <li>Save a new file entity associated with the logged-in user.</li>
+   *   <li>Upload the file to Dropbox storage and retrieve the download URL.</li>
+   *   <li>Using the download URL, upload and transcribe the file using Assembly AI.</li>
+   *   <li>Create a FileMeta object using the file, download URL, and Assembly AI ID.</li>
+   *   <li>Create a Transcription object using the transcript from Assembly AI.</li>
+   *   <li>Save the FileMeta and Transcription objects to the file entity.</li>
+   *   <li>Save the updated file entity to the repository.</li>
+   * </ul>
+   * </p>
+   *
+   * @param files the list of multipart files to be processed
+   * @return an UploadedFilesResponse containing lists of successfully processed and unprocessed
+   */
+  public UploadedFilesResponse create(List<MultipartFile> files) {
+    List<String> processedFiles = new ArrayList<>();
+    List<String> unprocessedFiles = new ArrayList<>();
+    User loggedUser = userService.getLoggedUser();
+
+    for (MultipartFile multipartFile : files) {
+      File file = new File();
+      try {
+        file.setUser(loggedUser);
+
+        String downloadUrl = dropboxService.upload(multipartFile);
+        AssemblyConvertedFile assemblyConvertedFile = assemblyService.transcribe(downloadUrl);
+
+        CreateFileMeta fileMetaDto = new CreateFileMeta(
+            multipartFile,
+            assemblyConvertedFile.getDownloadUrl(),
+            assemblyConvertedFile.getAssemblyId(),
+            file.getId()
+        );
+
+        CreateTranscription transcriptionDto = new CreateTranscription(
+            multipartFile.getOriginalFilename(),
+            assemblyConvertedFile.getTranscript()
+        );
+
+        file.setFileMeta(fileMetaService.create(fileMetaDto));
+        file.setTranscription(transcriptionService.create(transcriptionDto));
+        fileRepository.save(file);
+
+        processedFiles.add(multipartFile.getOriginalFilename());
+
+      } catch (
+          DropboxException |
+          AssemblyAIException |
+          NotFoundException |
+          BadResponseException exception
+      ) {
+        log.error("Error processing files: {}", exception.getMessage());
+        unprocessedFiles.add(multipartFile.getOriginalFilename());
+      }
+    }
+
+    return new UploadedFilesResponse(processedFiles, unprocessedFiles);
   }
 
-  public File get(Long id) throws BadResponseException {
+  public File findById(Long id) throws NotFoundException {
     return getFileById(id);
   }
 
   @Transactional
-  public void delete(File file) throws BadResponseException {
-    fileRepository.delete(getFileById(file.getId()));
+  public DeletedFilesResponse delete(List<Long> ids) throws NotFoundException {
+
+    List<String> deletedFiles = new ArrayList<>();
+    List<Long> failedIds = new ArrayList<>();
+
+    for (Long id : ids) {
+      try {
+        File file = getFileById(id);
+
+        dropboxService.delete(file);
+        assemblyService.deleteById(file.getFileMeta().getAssemblyAiId());
+        fileRepository.delete(file);
+
+        deletedFiles.add(file.getFileMeta().getName());
+      } catch (DropboxException | AssemblyAIException exception) {
+        log.error("Error deleting file: {}", exception.getMessage());
+        failedIds.add(id);
+      }
+    }
+
+    return new DeletedFilesResponse(deletedFiles, failedIds);
   }
 
   public Page<FileView> getAll(Pageable pageable) {
@@ -53,9 +147,9 @@ public class FileServiceImpl implements FileService {
         .map(fileMapper::toView);
   }
 
-  private File getFileById(Long id) throws BadResponseException {
+  private File getFileById(Long id) throws NotFoundException {
     return fileRepository.findById(id)
-        .orElseThrow(() -> new BadResponseException("File not found"));
+        .orElseThrow(() -> new NotFoundException("File not found"));
 
   }
 }

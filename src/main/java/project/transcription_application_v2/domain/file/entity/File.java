@@ -8,6 +8,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,8 +31,8 @@ public class File extends BaseEntity {
   private User user;
 
   @OneToOne(mappedBy = "file", cascade = {CascadeType.MERGE, CascadeType.PERSIST , CascadeType.REMOVE})
-  private FileMeta fileMeta;
+  private FileMeta fileMeta = null;
 
   @OneToOne(mappedBy = "file", cascade = {CascadeType.MERGE, CascadeType.PERSIST , CascadeType.REMOVE})
-  private Transcription transcription;
+  private Transcription transcription = null;
 }

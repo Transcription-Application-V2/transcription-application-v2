@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
+import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
 import project.transcription_application_v2.infrastructure.exceptions.RefreshTokenException;
 import project.transcription_application_v2.infrastructure.security.dto.AuthenticationRequest;
 import project.transcription_application_v2.infrastructure.security.dto.AuthenticationResponse;
@@ -30,7 +31,8 @@ public class AuthenticationController {
   }
 
   @PostMapping("/refresh-token")
-  public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) throws RefreshTokenException {
+  public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest)
+      throws RefreshTokenException, NotFoundException {
 
     return ResponseEntity
         .ok()
