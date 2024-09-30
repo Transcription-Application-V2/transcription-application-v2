@@ -9,7 +9,6 @@ import project.transcription_application_v2.domain.file.service.FileService;
 import project.transcription_application_v2.domain.file_meta.dto.CreateFileMeta;
 import project.transcription_application_v2.domain.file_meta.entity.FileMeta;
 import project.transcription_application_v2.domain.file_meta.repository.FileMetaRepository;
-import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
 import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
 import project.transcription_application_v2.infrastructure.mappers.FileMetaMapper;
 
@@ -28,10 +27,10 @@ public class FileMetaServiceImpl implements FileMetaService {
     this.fileService = fileService;
   }
 
-  public FileMeta create(CreateFileMeta dto) throws NotFoundException {
+  public void create(CreateFileMeta dto) throws NotFoundException {
     File file = fileService.findById(dto.fileId());
 
-    return fileMetaRepository.save(fileMetaMapper.toEntity(dto, file));
+    fileMetaRepository.save(fileMetaMapper.toEntity(dto, file));
   }
 
   public FileMeta findById(Long fileId) {

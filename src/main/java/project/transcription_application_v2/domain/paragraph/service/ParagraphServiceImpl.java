@@ -28,7 +28,7 @@ public class ParagraphServiceImpl implements ParagraphService {
     this.transcriptionService = transcriptionService;
   }
 
-  public List<Paragraph> create(CreateParagraph dto) throws NotFoundException {
+  public void create(CreateParagraph dto) throws NotFoundException {
 
     List<Paragraph> paragraphs = new ArrayList<>();
 
@@ -45,6 +45,6 @@ public class ParagraphServiceImpl implements ParagraphService {
     else
       log.warn("No utterances present..");
 
-    return paragraphRepository.saveAll(paragraphs);
+    paragraphRepository.saveAll(paragraphs);
   }
 }

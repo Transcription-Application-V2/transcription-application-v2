@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
 import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
 import project.transcription_application_v2.infrastructure.exceptions.RefreshTokenException;
+import project.transcription_application_v2.infrastructure.openAi.AuthControllerDocumentation;
 import project.transcription_application_v2.infrastructure.security.dto.AuthenticationRequest;
 import project.transcription_application_v2.infrastructure.security.dto.AuthenticationResponse;
 import project.transcription_application_v2.infrastructure.security.dto.MessageResponse;
@@ -18,7 +19,7 @@ import project.transcription_application_v2.infrastructure.security.service.Auth
 @RestController
 @RequestMapping("/api/v2/auth")
 @RequiredArgsConstructor
-public class AuthenticationController {
+public class AuthenticationController implements AuthControllerDocumentation {
 
   private final AuthenticationService authenticationService;
 

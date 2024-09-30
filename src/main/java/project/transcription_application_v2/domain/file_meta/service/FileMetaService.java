@@ -7,7 +7,7 @@ import project.transcription_application_v2.infrastructure.exceptions.NotFoundEx
 
 public interface FileMetaService {
 
-  FileMeta create(CreateFileMeta dto) throws BadResponseException, NotFoundException;
+  void create(CreateFileMeta dto) throws BadResponseException, NotFoundException;
 
   FileMeta findById(Long fileId);
 }

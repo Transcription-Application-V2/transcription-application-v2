@@ -56,13 +56,12 @@ public class FileServiceImpl implements FileService {
    *   <li>Using the download URL, upload and transcribe the file using Assembly AI.</li>
    *   <li>Create a FileMeta object using the file, download URL, and Assembly AI ID.</li>
    *   <li>Create a Transcription object using the transcript from Assembly AI.</li>
-   *   <li>Save the FileMeta and Transcription objects to the file entity.</li>
-   *   <li>Save the updated file entity to the repository.</li>
+   *   <li>Save the FileMeta and Transcription objects to the database.</li>
    * </ul>
    * </p>
    *
    * @param files the list of multipart files to be processed
-   * @return an UploadedFilesResponse containing lists of successfully processed and unprocessed
+   * @return an UploadedFilesResponse containing lists of successfully processed and unprocessed files
    */
   public UploadedFilesResponse create(List<MultipartFile> files) {
     List<String> processedFiles = new ArrayList<>();
@@ -73,6 +72,7 @@ public class FileServiceImpl implements FileService {
       File file = new File();
       try {
         file.setUser(loggedUser);
+        File savedFile = fileRepository.save(file);
 
         String downloadUrl = dropboxService.upload(multipartFile);
         AssemblyConvertedFile assemblyConvertedFile = assemblyService.transcribe(downloadUrl);
@@ -81,17 +81,17 @@ public class FileServiceImpl implements FileService {
             multipartFile,
             assemblyConvertedFile.getDownloadUrl(),
             assemblyConvertedFile.getAssemblyId(),
-            file.getId()
+            savedFile.getId()
         );
 
         CreateTranscription transcriptionDto = new CreateTranscription(
             multipartFile.getOriginalFilename(),
-            assemblyConvertedFile.getTranscript()
+            assemblyConvertedFile.getTranscript(),
+            savedFile.getId()
         );
 
-        file.setFileMeta(fileMetaService.create(fileMetaDto));
-        file.setTranscription(transcriptionService.create(transcriptionDto));
-        fileRepository.save(file);
+        fileMetaService.create(fileMetaDto);
+        transcriptionService.create(transcriptionDto);
 
         processedFiles.add(multipartFile.getOriginalFilename());
 
@@ -114,7 +114,7 @@ public class FileServiceImpl implements FileService {
   }
 
   @Transactional
-  public DeletedFilesResponse delete(List<Long> ids) throws NotFoundException {
+  public DeletedFilesResponse delete(List<Long> ids) {
 
     List<String> deletedFiles = new ArrayList<>();
     List<Long> failedIds = new ArrayList<>();
@@ -128,7 +128,7 @@ public class FileServiceImpl implements FileService {
         fileRepository.delete(file);
 
         deletedFiles.add(file.getFileMeta().getName());
-      } catch (DropboxException | AssemblyAIException exception) {
+      } catch (DropboxException | AssemblyAIException | NotFoundException exception) {
         log.error("Error deleting file: {}", exception.getMessage());
         failedIds.add(id);
       }

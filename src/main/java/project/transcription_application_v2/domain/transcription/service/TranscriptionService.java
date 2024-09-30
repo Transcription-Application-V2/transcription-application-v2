@@ -5,7 +5,8 @@ import project.transcription_application_v2.domain.transcription.entity.Transcri
 import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
 
 public interface TranscriptionService {
-  Transcription create(CreateTranscription dto) throws NotFoundException;
+
+  void create(CreateTranscription dto) throws NotFoundException;
 
   Transcription findById(Long id) throws NotFoundException;
 

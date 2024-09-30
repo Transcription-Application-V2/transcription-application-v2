@@ -4,7 +4,8 @@ import com.assemblyai.api.resources.transcripts.types.Transcript;
 
 public record CreateTranscription(
     String name,
-    Transcript transcript
+    Transcript transcript,
+    Long fileId
 ) {
 
 }
