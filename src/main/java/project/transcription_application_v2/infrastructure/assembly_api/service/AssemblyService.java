@@ -33,6 +33,15 @@ public class AssemblyService {
         .build();
   }
 
+  /**
+   * Transcribes a file from the given download URL using the Assembly AI API. If a transcription
+   * already exists for the given URL, it reuses the existing transcription. Otherwise, it creates a
+   * new transcription.
+   *
+   * @param downloadUrl the URL of the file to be transcribed
+   * @return an AssemblyConvertedFile containing the transcription details
+   * @throws AssemblyAIException if an error occurs during the transcription process
+   */
   public AssemblyConvertedFile transcribe(String downloadUrl) throws AssemblyAIException {
     try {
       Optional<FileMeta> firstByDownloadUrl = fileMetaService.findFirstByDownloadUrl(downloadUrl);
@@ -41,12 +50,12 @@ public class AssemblyService {
         log.info("Transcription with id {} already exists. Reuse it", byId.getId());
         return new AssemblyConvertedFile(byId.getId(), downloadUrl, byId);
       }
-      // Builds the params for the request to the Assembly AI API
+
       var params = TranscriptOptionalParams
           .builder()
           .speakerLabels(true)
           .build();
-      // Receives the transcription from the Assembly AI API request
+
       Transcript transcript = assemblyAI
           .transcripts()
           .transcribe(downloadUrl, params);
@@ -59,17 +68,13 @@ public class AssemblyService {
     }
   }
 
-  public Transcript getById(String id) throws AssemblyAIException {
-    try {
-      return this.assemblyAI
-          .transcripts()
-          .get(id);
-    } catch (Exception exception) {
-      log.error("Error while fetching transcription: {}", exception.getMessage());
-      throw new AssemblyAIException("Error while fetching transcription: {}" + exception.getMessage());
-    }
-  }
-
+  /**
+   * Deletes a transcription by its ID using the Assembly AI API. If the transcription is still in
+   * use, it will not be deleted.
+   *
+   * @param id the ID of the transcription to be deleted
+   * @throws AssemblyAIException if an error occurs during the deletion process
+   */
   public void deleteById(String id) throws AssemblyAIException {
     try {
       if (fileMetaService.moreThenOneAssemblyAiIds(id)) {
@@ -83,6 +88,18 @@ public class AssemblyService {
     } catch (Exception exception) {
       log.error("Error deleting transcription: {}", exception.getMessage());
       throw new AssemblyAIException("Error deleting transcription: {}" + exception.getMessage());
+    }
+  }
+
+  public Transcript getById(String id) throws AssemblyAIException {
+    try {
+      return this.assemblyAI
+          .transcripts()
+          .get(id);
+    } catch (Exception exception) {
+      log.error("Error while fetching transcription: {}", exception.getMessage());
+      throw new AssemblyAIException(
+          "Error while fetching transcription: {}" + exception.getMessage());
     }
   }
 }

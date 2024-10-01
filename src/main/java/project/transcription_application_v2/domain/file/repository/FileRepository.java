@@ -21,6 +21,8 @@ public interface FileRepository extends JpaRepository<File, Long> {
   @Query("SELECT f FROM File f WHERE f.user.id = :userId")
   Page<File> retrieveAllFilesByUserId(@Param("userId") Long userId, Pageable pageable);
 
+  List<File> findAllByUserId(Long userId);
+
   @Modifying
   @Query("DELETE FROM FileMeta fm WHERE fm.file.id = :fileId")
   void deleteFileMetaByFileId(@Param("fileId") Long fileId);

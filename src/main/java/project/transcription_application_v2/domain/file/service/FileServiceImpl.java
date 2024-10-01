@@ -64,6 +64,7 @@ public class FileServiceImpl implements FileService {
    * @param files the list of multipart files to be processed
    * @return an UploadedFilesResponse containing lists of successfully processed and unprocessed files
    */
+  @Override
   public UploadedFilesResponse create(List<MultipartFile> files) {
     List<String> processedFiles = new ArrayList<>();
     List<String> unprocessedFiles = new ArrayList<>();
@@ -111,11 +112,13 @@ public class FileServiceImpl implements FileService {
     return new UploadedFilesResponse(processedFiles, unprocessedFiles);
   }
 
-  public File findById(Long id) throws NotFoundException {
-    return getFileById(id);
+  @Override
+  public FileView getById(Long id) throws NotFoundException {
+    return fileMapper.toView(findById(id));
   }
 
   @Transactional
+  @Override
   public DeletedFilesResponse delete(List<Long> ids) {
 
     List<String> deletedFiles = new ArrayList<>();
@@ -137,6 +140,18 @@ public class FileServiceImpl implements FileService {
   }
 
   @Override
+  public Page<FileView> getAll(Pageable pageable) {
+    return fileRepository.retrieveAllFiles(pageable)
+        .map(fileMapper::toView);
+  }
+
+  @Override
+  public Page<FileView> getCurrentUsers(Pageable pageable) {
+    return fileRepository.retrieveAllFilesByUserId(userService.getLoggedUser().getId(), pageable)
+        .map(fileMapper::toView);
+  }
+
+  @Override
   @Transactional
   public void delete(Long id) throws NotFoundException, AssemblyAIException, DropboxException {
     File file = findById(id);
@@ -148,17 +163,13 @@ public class FileServiceImpl implements FileService {
     fileRepository.delete(file);
   }
 
-  public Page<FileView> getAll(Pageable pageable) {
-    return fileRepository.retrieveAllFiles(pageable)
-        .map(fileMapper::toView);
+  @Override
+  public List<File> getAllByCurrentUser(Long id) {
+    return fileRepository.findAllByUserId(id);
   }
 
-  public Page<FileView> getCurrentUsers(Pageable pageable) {
-    return fileRepository.retrieveAllFilesByUserId(userService.getLoggedUser().getId(), pageable)
-        .map(fileMapper::toView);
-  }
-
-  private File getFileById(Long id) throws NotFoundException {
+  @Override
+  public File findById(Long id) throws NotFoundException {
     return fileRepository.findById(id)
         .orElseThrow(() -> new NotFoundException("File not found"));
   }

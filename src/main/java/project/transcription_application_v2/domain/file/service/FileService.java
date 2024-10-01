@@ -25,5 +25,9 @@ public interface FileService {
 
   Page<FileView> getAll(Pageable pageable);
 
+  FileView getById(Long id) throws NotFoundException;
+
   Page<FileView> getCurrentUsers(Pageable pageable);
+
+  List<File> getAllByCurrentUser(Long id);
 }

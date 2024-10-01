@@ -47,6 +47,16 @@ public class DropboxService {
     client = new DbxClientV2(config, accessToken);
   }
 
+  /**
+   * Uploads a file to Dropbox for the specified user. If the file already exists, it checks for
+   * existing shared links. If no shared link exists, it creates a new one. If the file does not
+   * exist, it uploads the file and creates a shared link.
+   *
+   * @param file   the file to be uploaded
+   * @param userId the ID of the user uploading the file
+   * @return an UploadedDropboxFile containing the file name and download URL
+   * @throws DropboxException if an error occurs during the upload process
+   */
   public UploadedDropboxFile upload(MultipartFile file, Long userId) throws DropboxException {
     try {
       String hashedFileName = hashFile(file);
@@ -56,7 +66,6 @@ public class DropboxService {
         ListFolderResult result = client.files().listFolder("/" + userId);
         for (Metadata metadata : result.getEntries()) {
           if (metadata instanceof FileMetadata && metadata.getName().equals(hashedFileName)) {
-            // File exists, check for existing shared links
             ListSharedLinksResult sharedLinksResult = client.sharing().listSharedLinksBuilder()
                 .withPath(filePath)
                 .withDirectOnly(true)
@@ -69,7 +78,6 @@ public class DropboxService {
                   ensureDownloadUrl(sharedLink.getUrl())
               );
             }
-            // No existing shared link found, create a new one
             SharedLinkMetadata sharedLinkMetadata = client.sharing()
                 .createSharedLinkWithSettings(filePath, SharedLinkSettings.newBuilder().build());
             return new UploadedDropboxFile(
@@ -82,7 +90,6 @@ public class DropboxService {
         log.warn("Error checking for existing file: {}", exception.getMessage());
       }
 
-      // File does not exist, upload it
       client.files().uploadBuilder(filePath)
           .uploadAndFinish(file.getInputStream());
 
@@ -101,6 +108,14 @@ public class DropboxService {
     }
   }
 
+  /**
+   * Deletes a file from Dropbox for the specified user. If the user uses this download URL more
+   * than ones, it skips the deletion.
+   *
+   * @param file   the file to be deleted
+   * @param userId the ID of the user who owns the file
+   * @throws DropboxException if an error occurs during the deletion process
+   */
   public void delete(File file, Long userId) throws DropboxException {
     try {
       if (fileMetaService.moreThenOneDropboxDownloadUrls(file.getFileMeta().getDownloadUrl())) {
@@ -117,6 +132,14 @@ public class DropboxService {
     }
   }
 
+  /**
+   * Ensures the download URL is correctly formatted by manually replacing the "dl" parameter from 0
+   * to 1. The provided replace method from the Dropbox API does not work as expected.
+   *
+   * @param url the original URL
+   * @return the modified URL with "dl" parameter set to 1
+   * @throws URISyntaxException if the URL is not correctly formatted
+   */
   private String ensureDownloadUrl(String url) throws URISyntaxException {
     URI uri = new URI(url);
     URIBuilder uriBuilder = new URIBuilder(uri);
@@ -124,6 +147,15 @@ public class DropboxService {
     return uriBuilder.build().toString();
   }
 
+  /**
+   * Hashes the file using SHA-256 to create a unique hash for the specific file. If there are
+   * identical files, the hash will be the same; otherwise, the hash will be different.
+   *
+   * @param file the file to be hashed
+   * @return the SHA-256 hash of the file as a hexadecimal string
+   * @throws IOException              if an I/O error occurs
+   * @throws NoSuchAlgorithmException if the SHA-256 algorithm is not available
+   */
   private String hashFile(MultipartFile file) throws IOException, NoSuchAlgorithmException {
     MessageDigest digest = MessageDigest.getInstance("SHA-256");
     try (InputStream inputStream = file.getInputStream()) {

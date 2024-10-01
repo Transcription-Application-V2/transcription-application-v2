@@ -6,9 +6,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,8 +48,7 @@ public interface FileControllerDocumentation {
           content = @Content(schema = @Schema(implementation = Page.class)))
   })
   @SecurityRequirement(name = "bearerAuth")
-  ResponseEntity<Page<FileView>> getAll(@RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "20") int size);
+  ResponseEntity<Page<FileView>> getAll(Pageable pageable);
 
   @Operation(summary = "Get current user's files", description = "Get files of the current user with pagination")
   @ApiResponses(value = {
@@ -57,6 +56,5 @@ public interface FileControllerDocumentation {
           content = @Content(schema = @Schema(implementation = Page.class)))
   })
   @SecurityRequirement(name = "bearerAuth")
-  ResponseEntity<Page<FileView>> getCurrentUsers(@RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "20") int size);
+  ResponseEntity<Page<FileView>> getCurrentUsers(Pageable pageable);
 }
