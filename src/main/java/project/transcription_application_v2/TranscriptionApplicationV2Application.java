@@ -11,10 +11,8 @@ public class TranscriptionApplicationV2Application {
   }
 
   /* TODO:
-      4. Add docks to dropbox and assemblyAI
       5. add testing
       6. improve the dropbox and assemblyAI services (make it more readable)
-      7. add admin logic in the app
       8. add previous features from the previous version
       9. put flyway in the project changing spring.jpa.hibernate.ddl-auto=update to spring.jpa.hibernate.ddl-auto=validate
    */

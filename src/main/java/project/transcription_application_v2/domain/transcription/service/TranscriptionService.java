@@ -2,7 +2,7 @@ package project.transcription_application_v2.domain.transcription.service;
 
 import project.transcription_application_v2.domain.transcription.dto.CreateTranscription;
 import project.transcription_application_v2.domain.transcription.entity.Transcription;
-import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
 
 public interface TranscriptionService {
 

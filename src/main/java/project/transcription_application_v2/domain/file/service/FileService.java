@@ -8,20 +8,18 @@ import project.transcription_application_v2.domain.file.dto.DeletedFilesResponse
 import project.transcription_application_v2.domain.file.dto.FileView;
 import project.transcription_application_v2.domain.file.dto.UploadedFilesResponse;
 import project.transcription_application_v2.domain.file.entity.File;
-import project.transcription_application_v2.infrastructure.exceptions.AssemblyAIException;
-import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
-import project.transcription_application_v2.infrastructure.exceptions.DropboxException;
-import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.BadRequestException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
 
 public interface FileService {
 
-  UploadedFilesResponse create(List<MultipartFile> files) throws BadResponseException;
+  UploadedFilesResponse create(List<MultipartFile> files) throws BadRequestException;
 
   File findById(Long id) throws NotFoundException;
 
-  DeletedFilesResponse delete(List<Long> ids) throws BadResponseException, NotFoundException;
+  DeletedFilesResponse delete(List<Long> ids) throws BadRequestException, NotFoundException;
 
-  void delete (Long id) throws NotFoundException, AssemblyAIException, DropboxException;
+  void delete(Long id) throws NotFoundException, BadRequestException;
 
   Page<FileView> getAll(Pageable pageable);
 

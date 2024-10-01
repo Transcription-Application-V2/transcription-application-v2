@@ -1,5 +1,7 @@
 package project.transcription_application_v2.domain.file.service;
 
+import static project.transcription_application_v2.infrastructure.exceptions.ExceptionMessages.FILE_NOT_FOUND;
+
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +26,8 @@ import project.transcription_application_v2.infrastructure.assembly_api.dto.Asse
 import project.transcription_application_v2.infrastructure.assembly_api.service.AssemblyService;
 import project.transcription_application_v2.infrastructure.dropbox_api.DropboxService;
 import project.transcription_application_v2.infrastructure.dropbox_api.dto.UploadedDropboxFile;
-import project.transcription_application_v2.infrastructure.exceptions.AssemblyAIException;
-import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
-import project.transcription_application_v2.infrastructure.exceptions.DropboxException;
-import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.BadRequestException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
 import project.transcription_application_v2.infrastructure.mappers.FileMapper;
 
 @Service
@@ -99,10 +99,8 @@ public class FileServiceImpl implements FileService {
         processedFiles.add(multipartFile.getOriginalFilename());
 
       } catch (
-          DropboxException |
-          AssemblyAIException |
           NotFoundException |
-          BadResponseException exception
+          BadRequestException exception
       ) {
         log.error("Error processing files: {}", exception.getMessage());
         unprocessedFiles.add(multipartFile.getOriginalFilename());
@@ -130,7 +128,7 @@ public class FileServiceImpl implements FileService {
         delete(id);
 
         deletedFiles.add(file.getFileMeta().getName());
-      } catch (DropboxException | AssemblyAIException | NotFoundException exception) {
+      } catch (BadRequestException | NotFoundException exception) {
         log.error("Error deleting file: {}", exception.getMessage());
         failedIds.add(id);
       }
@@ -153,7 +151,7 @@ public class FileServiceImpl implements FileService {
 
   @Override
   @Transactional
-  public void delete(Long id) throws NotFoundException, AssemblyAIException, DropboxException {
+  public void delete(Long id) throws NotFoundException, BadRequestException {
     File file = findById(id);
 
     dropboxService.delete(file , userService.getLoggedUser().getId());
@@ -171,6 +169,6 @@ public class FileServiceImpl implements FileService {
   @Override
   public File findById(Long id) throws NotFoundException {
     return fileRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException("File not found"));
+        .orElseThrow(() -> new NotFoundException(FILE_NOT_FOUND, id));
   }
 }

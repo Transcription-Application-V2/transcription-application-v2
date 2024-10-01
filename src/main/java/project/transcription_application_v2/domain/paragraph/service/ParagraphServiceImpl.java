@@ -1,5 +1,7 @@
 package project.transcription_application_v2.domain.paragraph.service;
 
+import static project.transcription_application_v2.infrastructure.exceptions.ExceptionMessages.PARAGRAPH_NOT_FOUND;
+
 import com.assemblyai.api.resources.transcripts.types.TranscriptUtterance;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +14,7 @@ import project.transcription_application_v2.domain.paragraph.dto.CreateParagraph
 import project.transcription_application_v2.domain.paragraph.entity.Paragraph;
 import project.transcription_application_v2.domain.paragraph.repository.ParagraphRepository;
 import project.transcription_application_v2.domain.transcription.service.TranscriptionService;
-import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +59,6 @@ public class ParagraphServiceImpl implements ParagraphService {
 
   private Paragraph findById(Long paragraphId) throws NotFoundException {
     return paragraphRepository.findById(paragraphId)
-        .orElseThrow(() -> new NotFoundException("Paragraph not found"));
+        .orElseThrow(() -> new NotFoundException(PARAGRAPH_NOT_FOUND, paragraphId));
   }
 }

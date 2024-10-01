@@ -1,5 +1,8 @@
 package project.transcription_application_v2.infrastructure.security.service;
 
+import static project.transcription_application_v2.infrastructure.exceptions.ExceptionMessages.AUTHENTICATION_FAILED;
+import static project.transcription_application_v2.infrastructure.exceptions.ExceptionMessages.REFRESH_TOKEN_EXPIRED;
+
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,9 +11,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import project.transcription_application_v2.domain.user.entity.User;
-import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
-import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
-import project.transcription_application_v2.infrastructure.exceptions.RefreshTokenException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.BadRequestException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.ForbiddenException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
 import project.transcription_application_v2.infrastructure.security.dto.AuthenticationRequest;
 import project.transcription_application_v2.infrastructure.security.dto.AuthenticationResponse;
 import project.transcription_application_v2.infrastructure.security.dto.MessageResponse;
@@ -26,7 +29,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private final RefreshTokenService refreshTokenService;
   private final AuthenticationManager authenticationManager;
 
-  public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) throws BadResponseException {
+  public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest)
+      throws BadRequestException {
     try {
       Authentication authentication = authenticationManager.authenticate(
           new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
@@ -41,12 +45,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
       return new AuthenticationResponse(token, refreshToken.getToken());
     } catch (Exception | NotFoundException exception) {
-      throw new BadResponseException("Authentication failed: {}" + exception.getMessage());
+      throw new BadRequestException(AUTHENTICATION_FAILED, exception.getMessage());
     }
   }
 
   public AuthenticationResponse refreshToken(String refreshToken)
-      throws RefreshTokenException, NotFoundException {
+      throws ForbiddenException, NotFoundException {
     Optional<RefreshToken> existingToken = refreshTokenService.findByToken(refreshToken);
 
     if (existingToken.isPresent()) {
@@ -60,7 +64,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
       return new AuthenticationResponse(token, newRefreshToken.getToken());
     }
-    throw new RefreshTokenException(refreshToken, "Refresh token was expired. Please make a new sign-in request");
+    throw new ForbiddenException(REFRESH_TOKEN_EXPIRED);
   }
 
   public MessageResponse signOut() {

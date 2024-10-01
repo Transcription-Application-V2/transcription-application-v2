@@ -1,7 +1,7 @@
 package project.transcription_application_v2.domain.paragraph.service;
 
 import project.transcription_application_v2.domain.paragraph.dto.CreateParagraph;
-import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
 
 public interface ParagraphService {
 

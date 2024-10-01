@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
-import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.BadRequestException;
 import project.transcription_application_v2.infrastructure.security.dto.CreateUserRequest;
 import project.transcription_application_v2.infrastructure.security.dto.MessageResponse;
 
@@ -22,5 +22,6 @@ public interface UserControllerDocumentation {
         @ApiResponse(responseCode = "409", description = "Username or email already exists",
             content = @Content(mediaType = "application/json"))
     })
-    ResponseEntity<MessageResponse> handleSignUp(@RequestBody CreateUserRequest createUserRequest) throws BadResponseException;
+    ResponseEntity<MessageResponse> handleSignUp(@RequestBody CreateUserRequest createUserRequest)
+        throws BadRequestException;
 }

@@ -1,6 +1,7 @@
 package project.transcription_application_v2.infrastructure.security.configuration;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,8 @@ public class FilePermissionEvaluator {
       return fileService.getAllByCurrentUser(currentUser.getId())
           .stream()
           .map(File::getId)
-          .allMatch(id::contains);
+          .collect(Collectors.toSet())
+          .containsAll(id);
     }
     return false;
   }

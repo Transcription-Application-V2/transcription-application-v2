@@ -1,5 +1,7 @@
 package project.transcription_application_v2.domain.transcription.service;
 
+import static project.transcription_application_v2.infrastructure.exceptions.ExceptionMessages.TRANSCRIPTION_NOT_FOUND;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -13,7 +15,7 @@ import project.transcription_application_v2.domain.paragraph.service.ParagraphSe
 import project.transcription_application_v2.domain.transcription.dto.CreateTranscription;
 import project.transcription_application_v2.domain.transcription.entity.Transcription;
 import project.transcription_application_v2.domain.transcription.repository.TranscriptionRepository;
-import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
 import project.transcription_application_v2.infrastructure.mappers.TranscriptionMapper;
 
 @Service
@@ -48,7 +50,7 @@ public class TranscriptionServiceImpl implements TranscriptionService {
 
   public Transcription findById(Long id) throws NotFoundException {
     return transcriptionRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException("Transcription not found"));
+        .orElseThrow(() -> new NotFoundException(TRANSCRIPTION_NOT_FOUND, id));
   }
 
   @Override

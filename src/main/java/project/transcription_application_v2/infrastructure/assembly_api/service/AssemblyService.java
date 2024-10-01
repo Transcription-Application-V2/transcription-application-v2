@@ -1,5 +1,9 @@
 package project.transcription_application_v2.infrastructure.assembly_api.service;
 
+import static project.transcription_application_v2.infrastructure.exceptions.ExceptionMessages.ERROR_DELETING_TRANSCRIPTION;
+import static project.transcription_application_v2.infrastructure.exceptions.ExceptionMessages.ERROR_FETCHING_TRANSCRIPTION;
+import static project.transcription_application_v2.infrastructure.exceptions.ExceptionMessages.ERROR_TRANSCRIBING_FILE;
+
 import com.assemblyai.api.AssemblyAI;
 import com.assemblyai.api.resources.transcripts.types.Transcript;
 import com.assemblyai.api.resources.transcripts.types.TranscriptOptionalParams;
@@ -12,7 +16,8 @@ import org.springframework.stereotype.Service;
 import project.transcription_application_v2.domain.file_meta.entity.FileMeta;
 import project.transcription_application_v2.domain.file_meta.service.FileMetaService;
 import project.transcription_application_v2.infrastructure.assembly_api.dto.AssemblyConvertedFile;
-import project.transcription_application_v2.infrastructure.exceptions.AssemblyAIException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.BadRequestException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
 
 @Service
 @Slf4j
@@ -40,9 +45,9 @@ public class AssemblyService {
    *
    * @param downloadUrl the URL of the file to be transcribed
    * @return an AssemblyConvertedFile containing the transcription details
-   * @throws AssemblyAIException if an error occurs during the transcription process
+   * @throws BadRequestException if an error occurs during the transcription process
    */
-  public AssemblyConvertedFile transcribe(String downloadUrl) throws AssemblyAIException {
+  public AssemblyConvertedFile transcribe(String downloadUrl) throws BadRequestException {
     try {
       Optional<FileMeta> firstByDownloadUrl = fileMetaService.findFirstByDownloadUrl(downloadUrl);
       if (firstByDownloadUrl.isPresent()) {
@@ -62,9 +67,9 @@ public class AssemblyService {
 
       log.info("Transcription created successfully");
       return new AssemblyConvertedFile(transcript.getId(), downloadUrl, transcript);
-    } catch (Exception exception) {
+    } catch (Exception | NotFoundException exception) {
       log.error("Error transcribing the file: {}", exception.getMessage());
-      throw new AssemblyAIException("Error transcribing the file: {}" + exception.getMessage());
+      throw new BadRequestException(ERROR_TRANSCRIBING_FILE, exception.getMessage());
     }
   }
 
@@ -73,9 +78,9 @@ public class AssemblyService {
    * use, it will not be deleted.
    *
    * @param id the ID of the transcription to be deleted
-   * @throws AssemblyAIException if an error occurs during the deletion process
+   * @throws BadRequestException if an error occurs during the deletion process
    */
-  public void deleteById(String id) throws AssemblyAIException {
+  public void deleteById(String id) throws BadRequestException {
     try {
       if (fileMetaService.moreThenOneAssemblyAiIds(id)) {
         log.info("Transcription with id {} is still in use", id);
@@ -87,19 +92,18 @@ public class AssemblyService {
       log.info("Transcript deleted successfully");
     } catch (Exception exception) {
       log.error("Error deleting transcription: {}", exception.getMessage());
-      throw new AssemblyAIException("Error deleting transcription: {}" + exception.getMessage());
+      throw new BadRequestException(ERROR_DELETING_TRANSCRIPTION, exception.getMessage());
     }
   }
 
-  public Transcript getById(String id) throws AssemblyAIException {
+  public Transcript getById(String id) throws NotFoundException {
     try {
       return this.assemblyAI
           .transcripts()
           .get(id);
     } catch (Exception exception) {
       log.error("Error while fetching transcription: {}", exception.getMessage());
-      throw new AssemblyAIException(
-          "Error while fetching transcription: {}" + exception.getMessage());
+      throw new NotFoundException(ERROR_FETCHING_TRANSCRIPTION, exception.getMessage());
     }
   }
 }

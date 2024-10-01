@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +22,8 @@ import project.transcription_application_v2.domain.file.dto.DeletedFilesResponse
 import project.transcription_application_v2.domain.file.dto.FileView;
 import project.transcription_application_v2.domain.file.dto.UploadedFilesResponse;
 import project.transcription_application_v2.domain.file.service.FileService;
-import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
-import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.BadRequestException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
 import project.transcription_application_v2.infrastructure.openAi.FileControllerDocumentation;
 
 @RestController
@@ -38,7 +37,7 @@ public class FileController implements FileControllerDocumentation {
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
   public ResponseEntity<UploadedFilesResponse> upload(
       @Valid @NotEmptyFileList @RequestParam("files") List<MultipartFile> files
-  ) throws BadResponseException {
+  ) throws BadRequestException {
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -57,7 +56,7 @@ public class FileController implements FileControllerDocumentation {
   @PreAuthorize("hasAnyRole('ADMIN') || @filePermissionEvaluator.ownerUserAccess(authentication, #ids)")
   public ResponseEntity<DeletedFilesResponse> delete(
       @Valid @NotEmptyIdList @RequestParam("ids") List<Long> ids
-  ) throws BadResponseException, NotFoundException {
+  ) throws BadRequestException, NotFoundException {
 
     return ResponseEntity
         .ok()

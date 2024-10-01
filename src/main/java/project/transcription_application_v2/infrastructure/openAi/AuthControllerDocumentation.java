@@ -8,9 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
-import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
-import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
-import project.transcription_application_v2.infrastructure.exceptions.RefreshTokenException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.BadRequestException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.ForbiddenException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
 import project.transcription_application_v2.infrastructure.security.dto.AuthenticationRequest;
 import project.transcription_application_v2.infrastructure.security.dto.AuthenticationResponse;
 import project.transcription_application_v2.infrastructure.security.dto.MessageResponse;
@@ -41,24 +41,24 @@ public interface AuthControllerDocumentation {
       @ApiResponse(responseCode = "200", description = "User authenticated successfully",
           content = @Content(schema = @Schema(implementation = AuthenticationResponse.class))),
       @ApiResponse(responseCode = "400", description = "Invalid credentials",
-          content = @Content(schema = @Schema(implementation = BadResponseException.class)))
+          content = @Content(schema = @Schema(implementation = BadRequestException.class)))
   })
   ResponseEntity<AuthenticationResponse> authenticate(
       @RequestBody AuthenticationRequest authenticationRequest)
-      throws BadResponseException;
+      throws BadRequestException;
 
   @Operation(summary = "Refresh token", description = "Refresh the authentication token")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Token refreshed successfully",
           content = @Content(schema = @Schema(implementation = AuthenticationResponse.class))),
       @ApiResponse(responseCode = "400", description = "Invalid refresh token",
-          content = @Content(schema = @Schema(implementation = RefreshTokenException.class))),
+          content = @Content(schema = @Schema(implementation = ForbiddenException.class))),
       @ApiResponse(responseCode = "404", description = "Refresh token not found",
           content = @Content(schema = @Schema(implementation = NotFoundException.class)))
   })
   ResponseEntity<AuthenticationResponse> refreshToken(
       @RequestBody RefreshTokenRequest refreshTokenRequest)
-      throws RefreshTokenException, NotFoundException;
+      throws ForbiddenException, NotFoundException;
 
   @Operation(summary = "Invalidate session", description = "Invalidate the current user session")
   @ApiResponses(value = {

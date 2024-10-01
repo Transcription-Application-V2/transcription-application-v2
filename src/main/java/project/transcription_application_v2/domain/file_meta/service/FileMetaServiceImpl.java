@@ -1,5 +1,7 @@
 package project.transcription_application_v2.domain.file_meta.service;
 
+import static project.transcription_application_v2.infrastructure.exceptions.ExceptionMessages.FILE_META_NOT_FOUND;
+
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,7 @@ import project.transcription_application_v2.domain.file.service.FileService;
 import project.transcription_application_v2.domain.file_meta.dto.CreateFileMeta;
 import project.transcription_application_v2.domain.file_meta.entity.FileMeta;
 import project.transcription_application_v2.domain.file_meta.repository.FileMetaRepository;
-import project.transcription_application_v2.infrastructure.exceptions.NotFoundException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
 import project.transcription_application_v2.infrastructure.mappers.FileMetaMapper;
 
 @Service
@@ -44,7 +46,7 @@ public class FileMetaServiceImpl implements FileMetaService {
   @Override
   public FileMeta findById(Long fileId) throws NotFoundException {
     return fileMetaRepository.findById(fileId)
-        .orElseThrow(() -> new NotFoundException("FileMeta not found"));
+        .orElseThrow(() -> new NotFoundException(FILE_META_NOT_FOUND, fileId));
   }
 
   @Override

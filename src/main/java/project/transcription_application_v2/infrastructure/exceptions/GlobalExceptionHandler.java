@@ -1,6 +1,5 @@
 package project.transcription_application_v2.infrastructure.exceptions;
 
-import com.dropbox.core.BadRequestException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,13 +13,15 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.BadRequestException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.ForbiddenException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler({AssemblyAIException.class, BadRequestException.class,
-      BadResponseException.class})
-  public ResponseEntity<ProblemDetail> handleAssemblyAIException(GeneralException e) {
+  @ExceptionHandler(BadRequestException.class)
+  public ResponseEntity<ProblemDetail> handleAssemblyAIException(BadRequestException e) {
     ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
         e.getMessage());
 
@@ -29,12 +30,12 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(problemDetail, HttpStatus.BAD_REQUEST);
   }
 
-  @ExceptionHandler(RefreshTokenException.class)
-  public ResponseEntity<ProblemDetail> handleRefreshTokenException(RefreshTokenException e) {
+  @ExceptionHandler(ForbiddenException.class)
+  public ResponseEntity<ProblemDetail> handleRefreshTokenException(ForbiddenException e) {
     ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN,
         e.getMessage());
 
-    problemDetail.setTitle("Refresh Token Error");
+    problemDetail.setTitle(e.getTitle());
 
     return new ResponseEntity<>(problemDetail, HttpStatus.FORBIDDEN);
   }
@@ -44,7 +45,7 @@ public class GlobalExceptionHandler {
     ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND,
         e.getMessage());
 
-    problemDetail.setTitle("Not Found");
+    problemDetail.setTitle(e.getTitle());
 
     return new ResponseEntity<>(problemDetail, HttpStatus.NOT_FOUND);
   }

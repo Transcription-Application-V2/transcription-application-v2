@@ -1,5 +1,8 @@
 package project.transcription_application_v2.infrastructure.dropbox_api;
 
+import static project.transcription_application_v2.infrastructure.exceptions.ExceptionMessages.ERROR_DELETING_FILE;
+import static project.transcription_application_v2.infrastructure.exceptions.ExceptionMessages.ERROR_UPLOADING_FILE;
+
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
@@ -26,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.transcription_application_v2.domain.file.entity.File;
 import project.transcription_application_v2.domain.file_meta.service.FileMetaService;
 import project.transcription_application_v2.infrastructure.dropbox_api.dto.UploadedDropboxFile;
-import project.transcription_application_v2.infrastructure.exceptions.DropboxException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.BadRequestException;
 
 @Service
 @RequiredArgsConstructor
@@ -55,9 +58,9 @@ public class DropboxService {
    * @param file   the file to be uploaded
    * @param userId the ID of the user uploading the file
    * @return an UploadedDropboxFile containing the file name and download URL
-   * @throws DropboxException if an error occurs during the upload process
+   * @throws BadRequestException if an error occurs during the upload process
    */
-  public UploadedDropboxFile upload(MultipartFile file, Long userId) throws DropboxException {
+  public UploadedDropboxFile upload(MultipartFile file, Long userId) throws BadRequestException {
     try {
       String hashedFileName = hashFile(file);
       String filePath = "/" + userId + "/" + hashedFileName;
@@ -103,8 +106,7 @@ public class DropboxService {
       );
 
     } catch (DbxException | IOException | NoSuchAlgorithmException | URISyntaxException e) {
-      throw new DropboxException(
-          "Error uploading file or retrieving metadata: " + e.getLocalizedMessage());
+      throw new BadRequestException(ERROR_UPLOADING_FILE, e.getLocalizedMessage());
     }
   }
 
@@ -114,9 +116,9 @@ public class DropboxService {
    *
    * @param file   the file to be deleted
    * @param userId the ID of the user who owns the file
-   * @throws DropboxException if an error occurs during the deletion process
+   * @throws BadRequestException if an error occurs during the deletion process
    */
-  public void delete(File file, Long userId) throws DropboxException {
+  public void delete(File file, Long userId) throws BadRequestException {
     try {
       if (fileMetaService.moreThenOneDropboxDownloadUrls(file.getFileMeta().getDownloadUrl())) {
         log.info("File has more than one download URL, skipping deletion");
@@ -128,7 +130,7 @@ public class DropboxService {
       log.info("File deleted successfully");
     } catch (DbxException exception) {
       log.error("Error deleting file: {}", exception.getMessage());
-      throw new DropboxException("Error deleting file: " + exception.getMessage());
+      throw new BadRequestException(ERROR_DELETING_FILE, exception.getMessage());
     }
   }
 
