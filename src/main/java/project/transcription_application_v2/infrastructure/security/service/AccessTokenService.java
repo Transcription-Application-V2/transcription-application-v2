@@ -1,9 +1,17 @@
 package project.transcription_application_v2.infrastructure.security.service;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,11 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import project.transcription_application_v2.domain.user.entity.User;
 import project.transcription_application_v2.domain.user.service.UserService;
-
-import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +39,7 @@ public class AccessTokenService {
     return StringUtils.hasText(token) && token.startsWith("Bearer ") ? token.replace("Bearer ", "") : "";
   }
 
-  public String create(Long userId) {
+  public String create(Long userId) throws NotFoundException {
 
     Date now = new Date(System.currentTimeMillis());
 

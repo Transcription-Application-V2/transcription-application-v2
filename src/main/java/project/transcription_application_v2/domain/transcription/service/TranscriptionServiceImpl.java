@@ -1,41 +1,67 @@
 package project.transcription_application_v2.domain.transcription.service;
 
-import com.assemblyai.api.resources.transcripts.types.Transcript;
+import static project.transcription_application_v2.infrastructure.exceptions.ExceptionMessages.TRANSCRIPTION_NOT_FOUND;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import project.transcription_application_v2.domain.file.entity.File;
+import project.transcription_application_v2.domain.file.service.FileService;
+import project.transcription_application_v2.domain.paragraph.dto.CreateParagraph;
 import project.transcription_application_v2.domain.paragraph.entity.Paragraph;
+import project.transcription_application_v2.domain.paragraph.service.ParagraphService;
+import project.transcription_application_v2.domain.transcription.dto.CreateTranscription;
 import project.transcription_application_v2.domain.transcription.entity.Transcription;
 import project.transcription_application_v2.domain.transcription.repository.TranscriptionRepository;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
+import project.transcription_application_v2.infrastructure.mappers.TranscriptionMapper;
 
 @Service
 @RequiredArgsConstructor
 public class TranscriptionServiceImpl implements TranscriptionService {
 
+  private final ParagraphService paragraphService;
+  private FileService fileService;
+
   private final TranscriptionRepository transcriptionRepository;
 
-  public Transcription create(String name, List<Paragraph> paragraphs, Transcript transcript) {
-    long size = 0L;
-    if(transcript.getText().isPresent()) {
-      size = transcript.getText().get().length();
-    }
-    Transcription transcription =  new Transcription(
-        name,
-        size,
-        LocalDateTime.now(),
-        LocalDateTime.now(),
-        paragraphs
-        ,null
-    );
-    paragraphs.forEach(paragraph -> {paragraph.setTranscription(transcription);});
-    return transcription;
+  private final TranscriptionMapper transcriptionMapper;
+
+  @Autowired
+  public void setFileService(@Lazy FileService fileService) {
+    this.fileService = fileService;
   }
 
-  public Transcription findByFileId(Long fileId) {
-    Optional<Transcription> transcription = transcriptionRepository.findByFileIdWithParagraphs(fileId);
-    return transcription.orElse(null);
+  public void create(CreateTranscription dto) throws NotFoundException {
+    File file = fileService.findById(dto.fileId());
+
+    Transcription transcription = transcriptionRepository.save(
+        transcriptionMapper.toEntity(dto, file)
+    );
+
+    CreateParagraph createParagraph = new CreateParagraph(
+        dto.transcript(),
+        transcription.getId()
+    );
+    paragraphService.create(createParagraph);
+  }
+
+  public Transcription findById(Long id) throws NotFoundException {
+    return transcriptionRepository.findById(id)
+        .orElseThrow(() -> new NotFoundException(TRANSCRIPTION_NOT_FOUND, id));
+  }
+
+  @Override
+  @Transactional
+  public void delete(Long id) throws NotFoundException {
+    Transcription toDelete = findById(id);
+
+    for (Paragraph paragraph : toDelete.getParagraphs()) {
+      paragraphService.delete(paragraph.getId());
+    }
+
+    transcriptionRepository.delete(toDelete);
   }
 }

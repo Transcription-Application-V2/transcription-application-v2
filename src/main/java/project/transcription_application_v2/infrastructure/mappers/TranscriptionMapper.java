@@ -1,24 +1,26 @@
 package project.transcription_application_v2.infrastructure.mappers;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
+import project.transcription_application_v2.domain.file.entity.File;
+import project.transcription_application_v2.domain.transcription.dto.CreateTranscription;
 import project.transcription_application_v2.domain.transcription.dto.TranscriptionView;
 import project.transcription_application_v2.domain.transcription.entity.Transcription;
 
-@Component
-@RequiredArgsConstructor
-public class TranscriptionMapper {
+@Mapper(
+    componentModel = "spring",
+    uses = {ParagraphMapper.class},
+    implementationName = "TranscriptionMapperImpl"
+)
+public interface TranscriptionMapper {
 
-  private final ParagraphMapper paragraphMapper;
+  TranscriptionView toView(Transcription entity);
 
-  public TranscriptionView toTranscriptionView(Transcription transcription) {
-    return new TranscriptionView(
-        transcription.getId(),
-        transcription.getName(),
-        transcription.getSize(),
-        transcription.getPublishedAt(),
-        transcription.getLastModifiedAt(),
-        paragraphMapper.toParagraphViewList(transcription.getParagraphs()));
-  }
-
+  @Mappings({
+      @Mapping(target = "name", source = "dto.name"),
+      @Mapping(target = "size", expression = "java(dto.transcript().getText().map(String::length).map(Long::valueOf).orElse(0L))"),
+      @Mapping(target = "file", source = "file")
+  })
+  Transcription toEntity(CreateTranscription dto, File file);
 }

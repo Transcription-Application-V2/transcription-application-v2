@@ -1,5 +1,9 @@
 package project.transcription_application_v2.infrastructure.security.service;
 
+import static project.transcription_application_v2.infrastructure.exceptions.ExceptionMessages.AUTHENTICATION_FAILED;
+import static project.transcription_application_v2.infrastructure.exceptions.ExceptionMessages.REFRESH_TOKEN_EXPIRED;
+
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -7,15 +11,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import project.transcription_application_v2.domain.user.entity.User;
-import project.transcription_application_v2.infrastructure.exceptions.BadResponseException;
-import project.transcription_application_v2.infrastructure.exceptions.RefreshTokenException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.BadRequestException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.ForbiddenException;
+import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
 import project.transcription_application_v2.infrastructure.security.dto.AuthenticationRequest;
 import project.transcription_application_v2.infrastructure.security.dto.AuthenticationResponse;
 import project.transcription_application_v2.infrastructure.security.dto.MessageResponse;
 import project.transcription_application_v2.infrastructure.security.entity.RefreshToken;
 import project.transcription_application_v2.infrastructure.security.entity.UserDetailsImpl;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +29,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private final RefreshTokenService refreshTokenService;
   private final AuthenticationManager authenticationManager;
 
-  public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) throws BadResponseException {
+  public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest)
+      throws BadRequestException {
     try {
       Authentication authentication = authenticationManager.authenticate(
           new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
@@ -40,12 +44,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUser().getId());
 
       return new AuthenticationResponse(token, refreshToken.getToken());
-    } catch (Exception exception) {
-      throw new BadResponseException("Authentication failed: {}" + exception.getMessage());
+    } catch (Exception | NotFoundException exception) {
+      throw new BadRequestException(AUTHENTICATION_FAILED, exception.getMessage());
     }
   }
 
-  public AuthenticationResponse refreshToken(String refreshToken) throws RefreshTokenException {
+  public AuthenticationResponse refreshToken(String refreshToken)
+      throws ForbiddenException, NotFoundException {
     Optional<RefreshToken> existingToken = refreshTokenService.findByToken(refreshToken);
 
     if (existingToken.isPresent()) {
@@ -59,7 +64,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
       return new AuthenticationResponse(token, newRefreshToken.getToken());
     }
-    throw new RefreshTokenException(refreshToken, "Refresh token was expired. Please make a new sign-in request");
+    throw new ForbiddenException(REFRESH_TOKEN_EXPIRED);
   }
 
   public MessageResponse signOut() {
@@ -71,10 +76,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       SecurityContextHolder.getContext().setAuthentication(null);
 
       return new MessageResponse("Successfully signed out.");
-    } catch (Exception exception) {
+    } catch (Exception | NotFoundException exception) {
       return new MessageResponse("Signing out failed: {}" + exception.getMessage());
     }
   }
-
-
 }

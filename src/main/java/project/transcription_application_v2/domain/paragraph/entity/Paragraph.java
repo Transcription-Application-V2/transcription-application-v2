@@ -2,6 +2,7 @@ package project.transcription_application_v2.domain.paragraph.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import project.transcription_application_v2.domain.transcription.entity.Transcri
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Paragraph extends BaseEntity {
 
   @Column(nullable = false)

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,22 +16,33 @@ import project.transcription_application_v2.infrastructure.security.filters.Toke
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
   private final TokenFilter tokenFilter;
   private final CorsConfiguration corsConfiguration;
   private final AuthenticationProvider authenticationProvider;
+  private static final String[] WHITE_LIST = {
+      "/v2/api-docs",
+      "/v3/api-docs",
+      "/v3/api-docs/**",
+      "/swagger-resources",
+      "/swagger-resources/**",
+      "/configuration/ui",
+      "/configuration/security",
+      "/swagger-ui/**",
+      "/webjars/**",
+      "/swagger-ui.html",
+      "/api/v2/user/create",
+      "/api/v2/auth/authenticate",
+      "/api/v2/auth/refresh-token",
+  };
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
     return http
-        .exceptionHandling(exceptionHandling -> exceptionHandling
-            .authenticationEntryPoint((request, response, authException) -> {
-              response.sendError(response.getStatus());
-            }))
-
         .cors(cors -> cors
             .configurationSource(request -> corsConfiguration))
 
@@ -39,9 +51,7 @@ public class SecurityConfiguration {
         .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class)
 
         .authorizeHttpRequests(request -> request
-            .requestMatchers("/api/v2/user/create").permitAll()
-            .requestMatchers("/api/v2/auth/authenticate").permitAll()
-            .requestMatchers("/api/v2/auth/refresh-token").permitAll()
+            .requestMatchers(WHITE_LIST).permitAll()
             .anyRequest().authenticated())
 
         .authenticationProvider(authenticationProvider)
