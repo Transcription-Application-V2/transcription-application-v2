@@ -30,7 +30,6 @@ public interface UserControllerDocumentation {
         @ApiResponse(responseCode = "400", description = "Invalid input",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)))
     })
-    @PostMapping("/create")
     ResponseEntity<MessageResponse> handleSignUp(
         @RequestBody @Valid CreateUserRequest createUserRequest
     ) throws BadRequestException;
@@ -44,7 +43,6 @@ public interface UserControllerDocumentation {
         @ApiResponse(responseCode = "403", description = "Forbidden",
             content = @Content(mediaType = "application/json"))
     })
-    @GetMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
     ResponseEntity<UserView> get(@PathVariable Long id) throws NotFoundException;
 
@@ -58,7 +56,6 @@ public interface UserControllerDocumentation {
         @ApiResponse(responseCode = "403", description = "Forbidden",
             content = @Content(mediaType = "application/json"))
     })
-    @DeleteMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
     ResponseEntity<Void> delete(@PathVariable Long id)
         throws NotFoundException, BadRequestException;
@@ -74,7 +71,6 @@ public interface UserControllerDocumentation {
         @ApiResponse(responseCode = "403", description = "Forbidden",
             content = @Content(mediaType = "application/json"))
     })
-    @PutMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
     ResponseEntity<UserView> update(
         @PathVariable Long id,

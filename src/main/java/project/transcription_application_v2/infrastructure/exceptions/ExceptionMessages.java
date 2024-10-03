@@ -48,6 +48,10 @@ public enum ExceptionMessages {
   REFRESH_TOKEN_EXPIRED(
       "Refresh token was expired. Please make a new sign-in request",
       "Refresh token error"
+  ),
+  NO_PARAGRAPHS_FOUND(
+      "No paragraphs found for file ID: %s",
+      "No paragraphs found"
   );
 
   public final String message;

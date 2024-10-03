@@ -14,8 +14,7 @@ import project.transcription_application_v2.infrastructure.security.utils.Passwo
 
 @Mapper(
     componentModel = "spring",
-    implementationName = "UserMapperImpl",
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+    implementationName = "UserMapperImpl"
 )
 public abstract class UserMapper {
 
