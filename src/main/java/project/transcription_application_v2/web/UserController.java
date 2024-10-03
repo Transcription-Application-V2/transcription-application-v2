@@ -18,9 +18,9 @@ import project.transcription_application_v2.domain.user.dto.UserView;
 import project.transcription_application_v2.domain.user.service.UserService;
 import project.transcription_application_v2.infrastructure.exceptions.throwable.BadRequestException;
 import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
+import project.transcription_application_v2.infrastructure.openAi.UserControllerDocumentation;
 import project.transcription_application_v2.infrastructure.security.dto.CreateUserRequest;
 import project.transcription_application_v2.infrastructure.security.dto.MessageResponse;
-import project.transcription_application_v2.web.documentation.UserControllerDocumentation;
 
 @RestController
 @RequestMapping("/api/v2/user")
