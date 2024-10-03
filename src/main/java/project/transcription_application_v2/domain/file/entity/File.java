@@ -37,6 +37,6 @@ public class File extends BaseEntity {
   @OneToOne(mappedBy = "file")
   private Transcription transcription;
 
-  @Column(nullable = false)
+  @Column(name = "group_name")
   private String group = "default";
 }
