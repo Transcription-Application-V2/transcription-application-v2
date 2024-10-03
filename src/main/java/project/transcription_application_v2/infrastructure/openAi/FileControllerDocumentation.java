@@ -54,7 +54,8 @@ public interface FileControllerDocumentation {
           content = @Content(schema = @Schema(implementation = Page.class)))
   })
   @SecurityRequirement(name = "bearerAuth")
-  ResponseEntity<Page<FileView>> getAll(Pageable pageable);
+  ResponseEntity<Page<FileView>> getAll(@RequestParam(required = false) String group,
+      Pageable pageable);
 
   @Operation(summary = "Get current user's files", description = "Get files of the current user with pagination")
   @ApiResponses(value = {
@@ -62,7 +63,8 @@ public interface FileControllerDocumentation {
           content = @Content(schema = @Schema(implementation = Page.class)))
   })
   @SecurityRequirement(name = "bearerAuth")
-  ResponseEntity<Page<FileView>> getCurrentUsers(Pageable pageable);
+  ResponseEntity<Page<FileView>> getCurrentUsers(@RequestParam(required = false) String group,
+      Pageable pageable);
 
   @Operation(summary = "Get file by ID", description = "Get a file by its ID")
   @ApiResponses(value = {

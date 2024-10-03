@@ -1,6 +1,7 @@
 package project.transcription_application_v2.domain.file.entity;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -35,4 +36,7 @@ public class File extends BaseEntity {
 
   @OneToOne(mappedBy = "file")
   private Transcription transcription;
+
+  @Column(nullable = false)
+  private String group = "default";
 }

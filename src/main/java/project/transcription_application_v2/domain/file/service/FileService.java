@@ -21,11 +21,11 @@ public interface FileService {
 
   void delete(Long id) throws NotFoundException, BadRequestException;
 
-  Page<FileView> getAll(Pageable pageable);
+  Page<FileView> getAll(Pageable pageable , String group);
 
   FileView getById(Long id) throws NotFoundException;
 
-  Page<FileView> getCurrentUsers(Pageable pageable);
+  Page<FileView> getCurrentUsers(Pageable pageable , String group);
 
   List<File> getAllByCurrentUser(Long id);
 }

@@ -1,16 +1,14 @@
 package project.transcription_application_v2.domain.file.repository;
 
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 import project.transcription_application_v2.domain.file.entity.File;
-
-import java.util.List;
 
 @Repository
 public interface FileRepository extends JpaRepository<File, Long> {
@@ -18,8 +16,12 @@ public interface FileRepository extends JpaRepository<File, Long> {
   @Query("SELECT f FROM File f")
   Page<File> retrieveAllFiles(Pageable pageable);
 
+  Page<File> getAllByGroup(String group, Pageable pageable);
+
   @Query("SELECT f FROM File f WHERE f.user.id = :userId")
   Page<File> retrieveAllFilesByUserId(@Param("userId") Long userId, Pageable pageable);
+
+  Page<File> getAllByGroupAndUser_Id(String group, Long userId, Pageable pageable);
 
   List<File> findAllByUserId(Long userId);
 

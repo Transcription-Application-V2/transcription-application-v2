@@ -65,20 +65,25 @@ public class FileController implements FileControllerDocumentation {
 
   @GetMapping("/all")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  public ResponseEntity<Page<FileView>> getAll(Pageable pageable) {
-
+  public ResponseEntity<Page<FileView>> getAll(
+      @RequestParam(required = false) String group,
+      Pageable pageable
+  ) {
     return ResponseEntity
         .ok()
-        .body(service.getAll(pageable));
+        .body(service.getAll(pageable, group));
   }
 
   @GetMapping("/current-user")
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-  public ResponseEntity<Page<FileView>> getCurrentUsers(Pageable pageable) {
+  public ResponseEntity<Page<FileView>> getCurrentUsers(
+      @RequestParam(required = false) String group,
+      Pageable pageable
+  ) {
 
     return ResponseEntity
         .ok()
-        .body(service.getCurrentUsers(pageable));
+        .body(service.getCurrentUsers(pageable, group));
   }
 
 }
