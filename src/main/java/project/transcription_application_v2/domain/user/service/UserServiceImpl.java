@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.transcription_application_v2.domain.file.entity.File;
 import project.transcription_application_v2.domain.file.service.FileService;
+import project.transcription_application_v2.domain.user.dto.UpdateUser;
+import project.transcription_application_v2.domain.user.dto.UserView;
 import project.transcription_application_v2.domain.user.entity.User;
 import project.transcription_application_v2.domain.user.repository.UserRepository;
 import project.transcription_application_v2.infrastructure.exceptions.throwable.BadRequestException;
@@ -50,6 +52,20 @@ public class UserServiceImpl implements UserService {
   public User getLoggedUser() {
     UserDetailsImpl loggedUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     return loggedUser.getUser();
+  }
+
+  @Override
+  public UserView getById(Long id) throws NotFoundException {
+    return userMapper.toView(findById(id));
+  }
+
+  @Override
+  public UserView update(Long id, UpdateUser dto) throws NotFoundException {
+    User userToUpdate = findById(id);
+
+    userMapper.updateEntity(userToUpdate, dto);
+
+    return userMapper.toView(userRepository.save(userToUpdate));
   }
 
   @Override
