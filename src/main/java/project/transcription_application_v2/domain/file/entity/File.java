@@ -1,6 +1,5 @@
 package project.transcription_application_v2.domain.file.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,11 +8,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Builder.Default;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import project.transcription_application_v2.domain.BaseEntity;
 import project.transcription_application_v2.domain.file_meta.entity.FileMeta;
 import project.transcription_application_v2.domain.transcription.entity.Transcription;
@@ -25,6 +24,8 @@ import project.transcription_application_v2.domain.user.entity.User;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true, exclude = {"file , transcription , user"})
+@EqualsAndHashCode(callSuper = true, exclude = {"file , transcription , user"})
 public class File extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
