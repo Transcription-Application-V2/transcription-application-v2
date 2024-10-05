@@ -14,17 +14,16 @@ public class TranscriptionPermissionEvaluator {
 
   private final TranscriptionService transcriptionService;
 
-  public boolean ownerUserAccess(Authentication authentication, Long id) {
+  public boolean ownerUserAccess(Authentication authentication, Long id) throws NotFoundException {
     if (authentication != null
         && authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
 
       User currentUser = userDetails.getUser();
+      User transcriptionOwner = transcriptionService.findById(id)
+          .getFile()
+          .getUser();
 
-      try {
-        return transcriptionService.findById(id).getId().equals(currentUser.getId());
-      } catch (NotFoundException e) {
-        return false;
-      }
+      return currentUser.equals(transcriptionOwner);
     }
     return false;
   }

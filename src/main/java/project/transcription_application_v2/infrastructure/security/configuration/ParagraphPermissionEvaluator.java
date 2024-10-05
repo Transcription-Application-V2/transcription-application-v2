@@ -3,6 +3,7 @@ package project.transcription_application_v2.infrastructure.security.configurati
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import project.transcription_application_v2.domain.paragraph.service.ParagraphService;
 import project.transcription_application_v2.domain.user.entity.User;
 import project.transcription_application_v2.infrastructure.exceptions.throwable.NotFoundException;
@@ -14,17 +15,17 @@ public class ParagraphPermissionEvaluator {
 
   private final ParagraphService paragraphService;
 
-  public boolean ownerUserAccess(Authentication authentication, Long id) {
+  public boolean ownerUserAccess(Authentication authentication, Long id) throws NotFoundException {
     if (authentication != null
         && authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
 
       User currentUser = userDetails.getUser();
+      User userParagraphOwner = paragraphService.findById(id)
+          .getTranscription()
+          .getFile()
+          .getUser();
 
-      try {
-        return paragraphService.findById(id).getId().equals(currentUser.getId());
-      } catch (NotFoundException e) {
-        return false;
-      }
+      return currentUser.equals(userParagraphOwner);
     }
     return false;
   }

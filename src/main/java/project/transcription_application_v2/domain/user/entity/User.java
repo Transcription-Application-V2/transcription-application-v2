@@ -12,9 +12,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import project.transcription_application_v2.domain.BaseEntity;
 import project.transcription_application_v2.domain.file.entity.File;
 import project.transcription_application_v2.domain.user.enums.RoleName;
@@ -25,6 +27,8 @@ import project.transcription_application_v2.domain.user.enums.RoleName;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true, exclude = {"files"})
+@EqualsAndHashCode(callSuper = true, exclude = {"files"})
 public class User extends BaseEntity {
 
   @Column(unique = true, nullable = false)

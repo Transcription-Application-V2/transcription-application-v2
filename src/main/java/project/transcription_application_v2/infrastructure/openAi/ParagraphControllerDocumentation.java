@@ -22,10 +22,8 @@ public interface ParagraphControllerDocumentation {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Paragraph retrieved successfully",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ParagraphView.class))),
-      @ApiResponse(responseCode = "404", description = "Paragraph not found",
-          content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))),
-      @ApiResponse(responseCode = "403", description = "Forbidden",
-          content = @Content(mediaType = "application/json"))
+      @ApiResponse(responseCode = "404", description = "Paragraph not found"),
+      @ApiResponse(responseCode = "403", description = "Forbidden")
   })
   @SecurityRequirement(name = "bearerAuth")
   ResponseEntity<ParagraphView> get(@PathVariable Long id) throws NotFoundException;
@@ -50,10 +48,8 @@ public interface ParagraphControllerDocumentation {
   @Operation(summary = "Delete paragraph by ID", description = "Deletes a paragraph by its ID.")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "Paragraph deleted successfully"),
-      @ApiResponse(responseCode = "404", description = "Paragraph not found",
-          content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))),
-      @ApiResponse(responseCode = "403", description = "Forbidden",
-          content = @Content(mediaType = "application/json"))
+      @ApiResponse(responseCode = "404", description = "Paragraph not found"),
+      @ApiResponse(responseCode = "403", description = "Forbidden")
   })
   @SecurityRequirement(name = "bearerAuth")
   ResponseEntity<Void> delete(@PathVariable Long id) throws NotFoundException;
