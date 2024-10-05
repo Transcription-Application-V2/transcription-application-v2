@@ -29,7 +29,9 @@ public interface FileControllerDocumentation {
       @ApiResponse(responseCode = "201", description = "Files uploaded successfully",
           content = @Content(schema = @Schema(implementation = UploadedFilesResponse.class))),
       @ApiResponse(responseCode = "400", description = "No files provided",
-          content = @Content(schema = @Schema(implementation = BadRequestException.class)))
+          content = @Content(schema = @Schema(implementation = BadRequestException.class))),
+      @ApiResponse(responseCode = "403", description = "Forbidden",
+          content = @Content(mediaType = "application/json"))
   })
   @SecurityRequirement(name = "bearerAuth")
   ResponseEntity<UploadedFilesResponse> upload(
@@ -41,7 +43,9 @@ public interface FileControllerDocumentation {
       @ApiResponse(responseCode = "200", description = "Files deleted successfully",
           content = @Content(schema = @Schema(implementation = DeletedFilesResponse.class))),
       @ApiResponse(responseCode = "400", description = "No IDs provided",
-          content = @Content(schema = @Schema(implementation = BadRequestException.class)))
+          content = @Content(schema = @Schema(implementation = BadRequestException.class))),
+      @ApiResponse(responseCode = "403", description = "Forbidden",
+          content = @Content(mediaType = "application/json"))
   })
   @SecurityRequirement(name = "bearerAuth")
   ResponseEntity<DeletedFilesResponse> delete(
@@ -51,25 +55,33 @@ public interface FileControllerDocumentation {
   @Operation(summary = "Get all files", description = "Get all files with pagination")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Files retrieved successfully",
-          content = @Content(schema = @Schema(implementation = Page.class)))
+          content = @Content(schema = @Schema(implementation = Page.class))),
+      @ApiResponse(responseCode = "403", description = "Forbidden",
+          content = @Content(mediaType = "application/json"))
   })
   @SecurityRequirement(name = "bearerAuth")
-  ResponseEntity<Page<FileView>> getAll(Pageable pageable);
+  ResponseEntity<Page<FileView>> getAll(@RequestParam(required = false) String group,
+      Pageable pageable);
 
   @Operation(summary = "Get current user's files", description = "Get files of the current user with pagination")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Files retrieved successfully",
-          content = @Content(schema = @Schema(implementation = Page.class)))
+          content = @Content(schema = @Schema(implementation = Page.class))),
+      @ApiResponse(responseCode = "403", description = "Forbidden",
+          content = @Content(mediaType = "application/json"))
   })
   @SecurityRequirement(name = "bearerAuth")
-  ResponseEntity<Page<FileView>> getCurrentUsers(Pageable pageable);
+  ResponseEntity<Page<FileView>> getCurrentUsers(@RequestParam(required = false) String group,
+      Pageable pageable);
 
   @Operation(summary = "Get file by ID", description = "Get a file by its ID")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "File retrieved successfully",
           content = @Content(schema = @Schema(implementation = FileView.class))),
       @ApiResponse(responseCode = "404", description = "File not found",
-          content = @Content(schema = @Schema(implementation = NotFoundException.class)))
+          content = @Content(schema = @Schema(implementation = NotFoundException.class))),
+      @ApiResponse(responseCode = "403", description = "Forbidden",
+          content = @Content(mediaType = "application/json"))
   })
   @SecurityRequirement(name = "bearerAuth")
   ResponseEntity<FileView> getById(@PathVariable Long id) throws NotFoundException;

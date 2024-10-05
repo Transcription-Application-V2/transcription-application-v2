@@ -4,6 +4,7 @@ import static project.transcription_application_v2.infrastructure.exceptions.Exc
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -138,15 +139,21 @@ public class FileServiceImpl implements FileService {
   }
 
   @Override
-  public Page<FileView> getAll(Pageable pageable) {
-    return fileRepository.retrieveAllFiles(pageable)
-        .map(fileMapper::toView);
+  public Page<FileView> getAll(Pageable pageable, String group) {
+    return Optional.ofNullable(group)
+        .map(g -> fileRepository.getAllByGroup(g, pageable))
+        .map(files -> files.map(fileMapper::toView))
+        .orElse(fileRepository.retrieveAllFiles(pageable).map(fileMapper::toView));
   }
 
   @Override
-  public Page<FileView> getCurrentUsers(Pageable pageable) {
-    return fileRepository.retrieveAllFilesByUserId(userService.getLoggedUser().getId(), pageable)
-        .map(fileMapper::toView);
+  public Page<FileView> getCurrentUsers(Pageable pageable, String group) {
+    Long userId = userService.getLoggedUser().getId();
+
+    return Optional.ofNullable(group)
+        .map(g -> fileRepository.getAllByGroupAndUser_Id(g, userId, pageable))
+        .map(files -> files.map(fileMapper::toView))
+        .orElse(fileRepository.retrieveAllFilesByUserId(userId, pageable).map(fileMapper::toView));
   }
 
   @Override
@@ -154,7 +161,7 @@ public class FileServiceImpl implements FileService {
   public void delete(Long id) throws NotFoundException, BadRequestException {
     File file = findById(id);
 
-    dropboxService.delete(file , userService.getLoggedUser().getId());
+    dropboxService.delete(file , file.getUser().getId());
     assemblyService.deleteById(file.getFileMeta().getAssemblyAiId());
     fileMetaService.delete(file.getFileMeta().getId());
     transcriptionService.delete(file.getTranscription().getId());

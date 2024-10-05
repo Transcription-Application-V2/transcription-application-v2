@@ -7,9 +7,11 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import project.transcription_application_v2.domain.BaseEntity;
 import project.transcription_application_v2.domain.file.entity.File;
 
@@ -19,6 +21,8 @@ import project.transcription_application_v2.domain.file.entity.File;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true, exclude = {"file"})
+@EqualsAndHashCode(callSuper = true, exclude = {"file"})
 public class FileMeta extends BaseEntity {
 
   @Column(nullable = false)
