@@ -1,5 +1,7 @@
 package project.transcription_application_v2.domain.user.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import project.transcription_application_v2.domain.user.dto.UpdateUser;
 import project.transcription_application_v2.domain.user.dto.UserView;
 import project.transcription_application_v2.domain.user.entity.User;
@@ -22,4 +24,5 @@ public interface UserService {
 
   void delete(Long id) throws NotFoundException, BadRequestException;
 
+  Page<UserView> getAll(Pageable pageable);
 }

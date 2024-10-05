@@ -5,6 +5,8 @@ import static project.transcription_application_v2.infrastructure.exceptions.Exc
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,5 +78,12 @@ public class UserServiceImpl implements UserService {
     for (File file : userToDelete.getFiles()) {
       fileService.delete(file.getId());
     }
+
+    userRepository.delete(userToDelete);
+  }
+
+  @Override
+  public Page<UserView> getAll(Pageable pageable) {
+    return userRepository.findAll(pageable).map(userMapper::toView);
   }
 }

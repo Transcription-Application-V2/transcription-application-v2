@@ -7,12 +7,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import project.transcription_application_v2.domain.user.dto.UpdateUser;
 import project.transcription_application_v2.domain.user.dto.UserView;
@@ -76,4 +74,14 @@ public interface UserControllerDocumentation {
         @PathVariable Long id,
         @RequestBody @Valid UpdateUser dto
     ) throws NotFoundException, BadRequestException;
+
+    @Operation(summary = "Get all users", description = "Retrieves a paginated list of all users.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Users retrieved successfully",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
+        @ApiResponse(responseCode = "403", description = "Forbidden",
+            content = @Content(mediaType = "application/json"))
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    ResponseEntity<Page<UserView>> getAllUsers(Pageable pageable);
 }

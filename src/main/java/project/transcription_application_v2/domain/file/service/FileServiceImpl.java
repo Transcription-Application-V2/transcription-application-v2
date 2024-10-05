@@ -161,7 +161,7 @@ public class FileServiceImpl implements FileService {
   public void delete(Long id) throws NotFoundException, BadRequestException {
     File file = findById(id);
 
-    dropboxService.delete(file , userService.getLoggedUser().getId());
+    dropboxService.delete(file , file.getUser().getId());
     assemblyService.deleteById(file.getFileMeta().getAssemblyAiId());
     fileMetaService.delete(file.getFileMeta().getId());
     transcriptionService.delete(file.getTranscription().getId());

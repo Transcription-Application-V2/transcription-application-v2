@@ -2,6 +2,8 @@ package project.transcription_application_v2.web;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,25 +41,31 @@ public class UserController implements UserControllerDocumentation {
   }
 
   @GetMapping("/{id}")
-  @PreAuthorize("hasAnyRole('ADMIN') || @userPermissionEvaluator.ownerUserAccess(authentication, id)")
+  @PreAuthorize("hasAnyRole('ADMIN') || @userPermissionEvaluator.ownerUserAccess(authentication, #id)")
   public ResponseEntity<UserView> get(@PathVariable Long id) throws NotFoundException {
     return ResponseEntity.ok(userService.getById(id));
   }
 
+  @PutMapping("/{id}")
+  @PreAuthorize("hasAnyRole('ADMIN') || @userPermissionEvaluator.ownerUserAccess(authentication, #id)")
+  public ResponseEntity<UserView> update(
+      @PathVariable Long id,
+      @RequestBody @Valid UpdateUser dto
+  ) throws NotFoundException, BadRequestException {
+    return ResponseEntity.ok(userService.update(id, dto));
+  }
+
   @DeleteMapping("/{id}")
-  @PreAuthorize("hasAnyRole('ADMIN') || @userPermissionEvaluator.ownerUserAccess(authentication, id)")
+  @PreAuthorize("hasAnyRole('ADMIN') || @userPermissionEvaluator.ownerUserAccess(authentication, #id)")
   public ResponseEntity<Void> delete(@PathVariable Long id)
       throws NotFoundException, BadRequestException {
     userService.delete(id);
     return ResponseEntity.noContent().build();
   }
 
-  @PutMapping("/{id}")
-  @PreAuthorize("hasAnyRole('ADMIN') || @userPermissionEvaluator.ownerUserAccess(authentication, id)")
-  public ResponseEntity<UserView> update(
-      @PathVariable Long id,
-      @RequestBody @Valid UpdateUser dto
-  ) throws NotFoundException, BadRequestException {
-    return ResponseEntity.ok(userService.update(id, dto));
+  @GetMapping("/all")
+  @PreAuthorize("hasAnyRole('ADMIN')")
+  public ResponseEntity<Page<UserView>> getAllUsers(Pageable pageable) {
+    return ResponseEntity.ok(userService.getAll(pageable));
   }
 }
